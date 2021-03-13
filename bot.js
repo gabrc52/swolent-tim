@@ -48,6 +48,7 @@ client.on('guildMemberAdd', guildMember => {
 });
 
 client.on('message', async msg => {
+  const args = msg.content.split(' ');
   if (msg.content.trim() === 'tim.verify') {
     const guildMember = msg.guild.members.cache.get(msg.author.id);
     verify(guildMember);
