@@ -30,7 +30,7 @@ function isVerified(id) {
 function verify(guildMember) {
   const guild = guildMember.guild;
   const verification = isVerified(guildMember.id);
-  const channel = guild.channels.resolve(config.landing_channel[guild.id]);
+  const channel = guild.channels.cache.find(c => c.name === 'landing-pad');
   if (verification === true) {
     const verifiedRole = guild.roles.cache.find(r => r.name === 'verified');
     if (verifiedRole === undefined) {
