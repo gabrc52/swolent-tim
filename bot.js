@@ -11,6 +11,22 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
+/// Returns true or a string with the error message
+function isVerified(id) {
+  const guild = client.guilds.cache.get(config.guild_2025);
+  const guildMember = guild.members.cache.get(id);
+  if (guildMember === undefined) {
+    return "You're not in the MIT 2025 server."
+  } else {
+    const role = guildMember.roles.cache.get(config.verified_role);
+    if (role === undefined) {
+      return "Swole Tim hasn't verified you in the MIT 2025 server. Please follow the instructions to verify there."
+    } else {
+      return true;
+    }
+  }
+}
+
 client.on('message', async msg => {
   if (msg.content === 'tim.ping') {
     msg.channel.send(`Pong, ${msg.author}! The channel is ${msg.channel}.`);
@@ -46,18 +62,12 @@ client.on('message', async msg => {
   } else if (msg.content.startsWith('whitelist')) {
     const username = msg.content.substr(10);
     const url = `https://rgabriel.scripts.mit.edu/mc/prefrosh.php?name=${username}&discord=${msg.author.id}`;
-    const guild = client.guilds.cache.get(config.guild_2025);
-    const guildMember = guild.members.cache.get(msg.author.id);
-    if (guildMember === undefined) {
-      msg.reply("You're not in the MIT 2025 server. To get whitelisted go to https://mitcraft.ml. Go to #help if you're having trouble.");
+    const verification = isVerified(msg.author.id);
+    if (verification === true) {
+      const response = await got(url);
+      msg.channel.send(`${response.body}`);
     } else {
-      const role = guildMember.roles.cache.get(config.verified_role);
-      if (role === undefined) {
-        msg.reply("Swole Tim hasn't verified you in the MIT 2025 server. If you're a prefrosh, follow the instructions to verify, otherwise go to https://mitcraft.ml. Go to #help if you're having trouble.");
-      } else {
-        const response = await got(url);
-        msg.channel.send(`${response.body}`);
-      }
+      msg.reply(`${verification} If you're not a prefrosh, go to https://mitcraft.ml to get whitelisted. Go to #help if you're having trouble.`);
     }
   }
 });
