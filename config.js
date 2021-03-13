@@ -1,3 +1,6 @@
+
+const Discord = require('discord.js');
+
 module.exports = {
     reaction_threshold: 7,
     embed_color: '#fcaa32',
@@ -5,4 +8,7 @@ module.exports = {
     starboard_channel: '791775444302692382',
     guild_2025: '783435629186252820',
     verified_role: '789507257124913192',
+    landing_channel: {
+        '796946264851087373': '820366022585352312',
+    }   ,
 }

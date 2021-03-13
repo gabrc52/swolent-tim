@@ -27,8 +27,31 @@ function isVerified(id) {
   }
 }
 
+function verify(guildMember) {
+  const guild = guildMember.guild;
+  const verification = isVerified(guildMember.id);
+  const channel = guild.channels.resolve(config.landing_channel[guild.id]);
+  if (verification === true) {
+    const verifiedRole = guild.roles.cache.find(r => r.name === 'verified');
+    if (verifiedRole === undefined) {
+      channel.send(`Could not find verified role in ${guild.name}`);
+    } else {
+      guildMember.roles.add(verifiedRole);
+    }
+  } else {
+    channel.send(`${guildMember}: ${verification}`);
+  }
+}
+
+client.on('guildMemberAdd', guildMember => {
+  verify(guildMember);
+});
+
 client.on('message', async msg => {
-  if (msg.content === 'tim.ping') {
+  if (msg.content.trim() === 'tim.verify') {
+    const guildMember = msg.guild.members.cache.get(msg.author.id);
+    verify(guildMember);
+  } else if (msg.content === 'tim.ping') {
     msg.channel.send(`Pong, ${msg.author}! The channel is ${msg.channel}.`);
   } else if (msg.content.trim() === 'tim.taken') {
     msg.reply("Please specify a possible kerb to know if it's taken or not (for example: `tim.taken stress`).")
