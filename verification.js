@@ -20,6 +20,10 @@ const verify = (guildMember, client) => {
     const guild = guildMember.guild;
     const verification = isVerified(guildMember.id, client);
     const channel = guild.channels.cache.find(c => c.name === 'landing-pad');
+    /// Don't try to verify if #landing-pad doesn't exist
+    if (!channel) {
+        return;
+    }
     if (verification === true) {
         const verifiedRole = guild.roles.cache.find(r => r.name === 'verified');
         if (verifiedRole === undefined) {
