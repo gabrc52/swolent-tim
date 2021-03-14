@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const got = require('got');
 const config = require('./config');
+const fs = require('fs');
 const verification = require('./verification');
 
 module.exports = {
@@ -60,5 +61,37 @@ module.exports = {
                 msg.reply(`${verificationStatus} If you're not a prefrosh, go to https://mitcraft.ml to get whitelisted. Go to #help if you're having trouble.`);
             }
         }
+    },
+    'confess': (msg, args, client) => {
+        if (msg.deletable) {
+            msg.delete();
+        } else {
+            msg.reply("Could not delete message, either the permissions are wrong, or this is a DM channel. Please delete manually.");
+        }
+        const confession = msg.content.substr(8);
+        const confessor = msg.author.id;
+        const guild = client.guilds.cache.get(config.guild_2025);
+        const channel = guild.channels.resolve(config.confessions_channel);
+        const verificationStatus = verification.isVerified(confessor, client);
+        let number;
+        fs.readFile('confession_counter', 'utf8', (err, data) => {
+            if (err) {
+                number = 1;
+            } else {
+                data++;
+                number = data;
+            }
+            fs.writeFileSync('confession_counter', number);
+            if (verificationStatus === true) {
+                const embed = new Discord.MessageEmbed()
+                    .setAuthor(`Confession #${number}`)
+                    .setColor(config.embed_color)
+                    .setDescription(confession);
+                channel.send(embed);
+            } else {
+                msg.reply(`Can't confess: ${verificationStatus}`);
+            }
+        }
+        );
     },
 };
