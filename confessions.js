@@ -13,18 +13,21 @@ const encryptWithPublicKey = (fragment, publicKey) => {
     return fragment;
 }
 
-const logConfession = (number, confession, confessor, msg, client) => {
+const logConfession = async (number, confession, confessor, msg, client) => {
     const secretStr = `Confession #${number} by ${confessor}: ${confession}`;
     const secret = Buffer.from(secretStr);
     const numMods = config.server_mods.length;
     const shares = sss.split(secret, { shares: numMods, threshold: Math.ceil(numMods / 2) });
     for (let i = 0; i < shares.length; i++) {
         const fragment = shares[i].toString('base64');
-        client.users.fetch(config.server_mods[i]).then(user => {
-            user.send(`**Confession #${number}**:\n${encryptWithPublicKey(fragment, config.public_keys[i])}`);
-        });
+        const encryptedFragment = encryptWithPublicKey(fragment, config.public_keys[i]);
+        try {
+            const user = await client.users.fetch(config.server_mods[i]);
+            user.send(`**Confession #${number}**:\n${encryptedFragment}`);
+        } catch(e) {
+            msg.reply(e);
+        }
     }
-    msg.reply(s);
 };
 
 const confessCommand = (msg, args, client) => {
