@@ -1,6 +1,3 @@
-
-const Discord = require('discord.js');
-
 module.exports = {
     reaction_threshold: 7,
     embed_color: '#fcaa32',
