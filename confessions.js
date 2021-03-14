@@ -51,7 +51,7 @@ const confessCommand = (msg, args, client) => {
                 number = data;
             }
             logConfession(number, confession, confessor, msg, client);
-            fs.writeFileSync('confession_counter', number);
+            fs.writeFileSync('confession_counter', number.toString());
             const embed = new Discord.MessageEmbed()
                 .setAuthor(`Confession #${number}`)
                 .setColor(config.embed_color)
