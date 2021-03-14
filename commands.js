@@ -73,25 +73,24 @@ module.exports = {
         const guild = client.guilds.cache.get(config.guild_2025);
         const channel = guild.channels.resolve(config.confessions_channel);
         const verificationStatus = verification.isVerified(confessor, client);
-        let number;
-        fs.readFile('confession_counter', 'utf8', (err, data) => {
-            if (err) {
-                number = 1;
-            } else {
-                data++;
-                number = data;
-            }
-            fs.writeFileSync('confession_counter', number);
-            if (verificationStatus === true) {
+        if (verificationStatus === true) {
+            let number;
+            fs.readFile('confession_counter', 'utf8', (err, data) => {
+                if (err) {
+                    number = 1;
+                } else {
+                    data++;
+                    number = data;
+                }
+                fs.writeFileSync('confession_counter', number);
                 const embed = new Discord.MessageEmbed()
                     .setAuthor(`Confession #${number}`)
                     .setColor(config.embed_color)
                     .setDescription(confession);
                 channel.send(embed);
-            } else {
-                msg.reply(`Can't confess: ${verificationStatus}`);
-            }
+            });
+        } else {
+            msg.reply(`Can't confess: ${verificationStatus}`);
         }
-        );
     },
 };
