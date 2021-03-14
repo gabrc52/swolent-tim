@@ -36,7 +36,7 @@ const confessCommand = (msg, args, client) => {
     } else {
         msg.reply("Could not delete message, either the permissions are wrong, or this is a DM channel. Please delete manually.");
     }
-    const confession = msg.content.substr(8);
+    const confession = msg.content.substr(args[0].length + 1);
     const confessor = msg.author.id;
     const guild = client.guilds.cache.get(config.guild_2025);
     const channel = guild.channels.resolve(config.confessions_channel);
