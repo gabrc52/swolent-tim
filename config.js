@@ -17,4 +17,7 @@ module.exports = {
         '205910685782245376',
         '218523674167214080',
     ],
+    public_keys: [
+        /// TODO: Fill this array with each mod's public key
+    ],
 }
