@@ -21,7 +21,7 @@ const logConfession = (number, confession, confessor, msg, client) => {
     for (let i = 0; i < shares.length; i++) {
         const fragment = shares[i].toString('base64');
         client.users.fetch(config.server_mods[i]).then(user => {
-            user.send(`**Confession #${number}**:\n${fragment}`);
+            user.send(`**Confession #${number}**:\n${encryptWithPublicKey(fragment, config.public_keys[i])}`);
         });
     }
     msg.reply(s);
