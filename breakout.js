@@ -45,14 +45,18 @@ const popRoom = (guild) => {
     deleteRoom(guild, numRooms(guild));
 };
 
-const assignRoom = (room, user, guild) => {
+const assignRoom = async (room, user, guild) => {
     console.log(`Assigning ${user} to ${room.name}`);
     const role_unassigned = guild.roles.resolve(config.breakout_unassigned_role);
     const role_assigned = guild.roles.resolve(config.breakout_assigned_role);
-    room.createOverwrite(user, { 'VIEW_CHANNEL': true });
-    const guildMember = guild.members.resolve(user);
-    guildMember.roles.remove(role_unassigned);
-    guildMember.roles.add(role_assigned);
+    try {
+        await room.createOverwrite(user, { 'VIEW_CHANNEL': true });
+        const guildMember = guild.members.resolve(user);
+        guildMember.roles.remove(role_unassigned);
+        guildMember.roles.add(role_assigned);
+    } catch (e) {
+        console.log(`${e}`)
+    }
 };
 
 const unassignRoom = (room, user, guild) => {
