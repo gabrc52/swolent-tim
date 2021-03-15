@@ -7,6 +7,7 @@ module.exports = {
     verified_role: '789507257124913192',
     confessions_channel: '819127555911188541', /// MIT 2025
     // confessions_channel: '820481506492940369', /// Test server
+    welcome_channel: '820830137674760202',
     breakout_unassigned_role: '820052377306529874',
     breakout_assigned_role: '820817118097571850',
     breakout_category: '818262593696956446',
