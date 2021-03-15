@@ -65,7 +65,7 @@ const isFull = (room) => {
 
 const assignToRoom = async (user, guild) => {
     if (numRooms(guild) === 0 || isFull(topRoom(guild))) {
-        pushRoom(guild);
+        await pushRoom(guild);
     }
     if (topRoom(guild) === undefined) {
         console.log('Aaaaah room is undefined');
