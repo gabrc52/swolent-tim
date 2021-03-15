@@ -92,6 +92,6 @@ const fillBreakoutRooms = async (client) => {
 };
 
 module.exports = {
-    assignToRoom = assignToRoom,
-    fillBreakoutRooms = fillBreakoutRooms,
+    assignToRoom: assignToRoom,
+    fillBreakoutRooms: fillBreakoutRooms,
 };
