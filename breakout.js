@@ -70,7 +70,7 @@ const sizeOfRoom = (room) => {
 };
 
 const isFull = (room) => {
-    return sizeOfRoom(room) >= 10;
+    return sizeOfRoom(room) >= config.breakout_room_size;
 };
 
 const assignToRoom = (user, guild) => {
