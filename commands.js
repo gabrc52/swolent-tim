@@ -66,8 +66,8 @@ module.exports = {
     'confess': confessions.confessCommand,
     'tim.confess': confessions.confessCommand,
     'tim.deconfess': confessions.deconfessCommand,
-    'tim.fillTheBreakoutRooms': (msg, args, client) => {
+    'tim.fillTheBreakoutRooms': async (msg, args, client) => {
         msg.reply('Ok, filling breakout rooms...');
-        breakout.fillBreakoutRooms(client);
+        await breakout.fillBreakoutRooms(client);
     },
 };
