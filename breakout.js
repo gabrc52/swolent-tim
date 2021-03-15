@@ -73,7 +73,7 @@ const isFull = (room) => {
 };
 
 const assignToRoom = (user, guild) => {
-    if (isFull(topRoom(guild))) {
+    if (numRooms(guild) === 0 || isFull(topRoom(guild))) {
         pushRoom(guild);
     }
     assignRoom(topRoom(guild), user, guild);
