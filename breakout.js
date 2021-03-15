@@ -63,7 +63,7 @@ const isFull = (room) => {
     return sizeOfRoom(room) >= config.breakout_room_size;
 };
 
-const assignToRoom = (user, guild) => {
+const assignToRoom = async (user, guild) => {
     if (numRooms(guild) === 0 || isFull(topRoom(guild))) {
         pushRoom(guild);
     }
