@@ -7,21 +7,21 @@ const getRoom = (guild, number) => {
     return guild.channels.cache.find(channel => channel.name == name);
 };
 
-const createRoom = (guild, number) => {
+const createRoom = async (guild, number) => {
     const name = `room-${number}`;
     if (getRoom(guild, number) === undefined) {
         const category = guild.channels.resolve(config.breakout_category);
-        guild.channels.create(name, {
+        await guild.channels.create(name, {
             topic: `Small chat #${number}: hang out with 10 other people! :D`,
             parent: category,
         });
     }
 };
 
-const deleteRoom = (guild, number) => {
+const deleteRoom = async (guild, number) => {
     const room = getRoom(guild, number);
     if (room !== undefined) {
-        room.delete();
+        await room.delete();
     }
 };
 
@@ -37,31 +37,12 @@ const topRoom = (guild) => {
     return getRoom(guild, numRooms(guild));
 };
 
-const pushRoom = (guild) => {
-    createRoom(guild, numRooms(guild) + 1);
+const pushRoom = async (guild) => {
+    await createRoom(guild, numRooms(guild) + 1);
 };
 
 const popRoom = (guild) => {
     deleteRoom(guild, numRooms(guild));
-};
-
-const assignRoom = async (room, user, guild) => {
-    if (room === undefined) {
-        console.log('Aaaaah room is undefined');
-        return;
-    }
-    console.log(`Starting assigning ${user} to ${room.name}`);
-    const role_unassigned = guild.roles.resolve(config.breakout_unassigned_role);
-    const role_assigned = guild.roles.resolve(config.breakout_assigned_role);
-    try {
-        await room.createOverwrite(user, { 'VIEW_CHANNEL': true });
-        const guildMember = guild.members.resolve(user);
-        guildMember.roles.remove(role_unassigned);
-        guildMember.roles.add(role_assigned);
-        console.log(`Finished assigning ${user} to ${room.name}`);
-    } catch (e) {
-        console.log(`${e}`)
-    }
 };
 
 const unassignRoom = (room, user, guild) => {
@@ -86,7 +67,22 @@ const assignToRoom = (user, guild) => {
     if (numRooms(guild) === 0 || isFull(topRoom(guild))) {
         pushRoom(guild);
     }
-    assignRoom(topRoom(guild), user, guild);
+    if (topRoom(guild) === undefined) {
+        console.log('Aaaaah room is undefined');
+        return;
+    }
+    const role_unassigned = guild.roles.resolve(config.breakout_unassigned_role);
+    const role_assigned = guild.roles.resolve(config.breakout_assigned_role);
+    console.log(`Starting assigning ${user} to ${topRoom(guild).name}`);
+    try {
+        await topRoom(guild).createOverwrite(user, { 'VIEW_CHANNEL': true });
+        const guildMember = guild.members.resolve(user);
+        await guildMember.roles.remove(role_unassigned);
+        await guildMember.roles.add(role_assigned);
+        console.log(`Finished assigning ${user} to ${topRoom(guild).name}`);
+    } catch (e) {
+        console.log(`${e}`)
+    }
 };
 
 /**
