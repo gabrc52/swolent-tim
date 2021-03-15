@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const config = require('./config');
+const shuffle = require('shuffle-array');
 
 const getRoom = (guild, number) => {
     const name = `room-${number}`;
@@ -85,5 +86,12 @@ const assignToRoom = (user, guild) => {
 const fillBreakoutRooms = async (client) => {
     const guild = client.guilds.cache.get(config.guild_2025);
     const role_unassigned = guild.roles.resolve(config.breakout_unassigned_role);
+    const unassignedPeople = role_unassigned.members.map(member => member.user.id);
+    shuffle(unassignedPeople);
+    unassignedPeople.forEach(user => assignToRoom(user, guild));
+};
 
+module.exports = {
+    assignToRoom = assignToRoom,
+    fillBreakoutRooms = fillBreakoutRooms,
 };

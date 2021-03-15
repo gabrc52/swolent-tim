@@ -3,6 +3,7 @@ const got = require('got');
 const config = require('./config');
 const verification = require('./verification');
 const confessions = require('./confessions');
+const breakout = require('./breakout');
 
 module.exports = {
     'tim.verify': (msg, args, client) => {
@@ -65,4 +66,8 @@ module.exports = {
     'confess': confessions.confessCommand,
     'tim.confess': confessions.confessCommand,
     'tim.deconfess': confessions.deconfessCommand,
+    'tim.fillTheBreakoutRooms': (msg, args, client) => {
+        msg.reply('Ok, filling breakout rooms...');
+        breakout.fillBreakoutRooms(client);
+    },
 };
