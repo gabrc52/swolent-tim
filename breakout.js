@@ -94,7 +94,7 @@ const fillBreakoutRooms = async (client) => {
     const role_unassigned = guild.roles.resolve(config.breakout_unassigned_role);
     const unassignedPeople = role_unassigned.members.map(member => member.user.id);
     shuffle(unassignedPeople);
-    for (const user in unassignedPeople) {
+    for (const user of unassignedPeople) {
         await assignToRoom(user, guild);
     }
 };
