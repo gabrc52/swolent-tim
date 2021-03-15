@@ -46,6 +46,10 @@ const popRoom = (guild) => {
 };
 
 const assignRoom = async (room, user, guild) => {
+    if (room === undefined) {
+        console.log('Aaaaah room is undefined');
+        return;
+    }
     console.log(`Starting assigning ${user} to ${room.name}`);
     const role_unassigned = guild.roles.resolve(config.breakout_unassigned_role);
     const role_assigned = guild.roles.resolve(config.breakout_assigned_role);
