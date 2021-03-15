@@ -73,6 +73,7 @@ const isFull = (room) => {
 };
 
 const assignToRoom = (user, guild) => {
+    console.log(`Assigning ${user.tag}`);
     if (numRooms(guild) === 0 || isFull(topRoom(guild))) {
         pushRoom(guild);
     }
