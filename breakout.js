@@ -46,7 +46,7 @@ const popRoom = (guild) => {
 };
 
 const assignRoom = async (room, user, guild) => {
-    console.log(`Assigning ${user} to ${room.name}`);
+    console.log(`Starting assigning ${user} to ${room.name}`);
     const role_unassigned = guild.roles.resolve(config.breakout_unassigned_role);
     const role_assigned = guild.roles.resolve(config.breakout_assigned_role);
     try {
@@ -54,6 +54,7 @@ const assignRoom = async (room, user, guild) => {
         const guildMember = guild.members.resolve(user);
         guildMember.roles.remove(role_unassigned);
         guildMember.roles.add(role_assigned);
+        console.log(`Finished assigning ${user} to ${room.name}`);
     } catch (e) {
         console.log(`${e}`)
     }
@@ -93,7 +94,9 @@ const fillBreakoutRooms = async (client) => {
     const role_unassigned = guild.roles.resolve(config.breakout_unassigned_role);
     const unassignedPeople = role_unassigned.members.map(member => member.user.id);
     shuffle(unassignedPeople);
-    unassignedPeople.forEach(user => assignToRoom(user, guild));
+    for (const user in unassignedPeople) {
+        await assignToRoom(user, guild);
+    }
 };
 
 module.exports = {
