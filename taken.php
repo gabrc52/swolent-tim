@@ -15,6 +15,13 @@ if ($mailingListTaken) {
 	echo ":x: ".$name." is taken as a kerb";
 } else {
 	echo ":white_check_mark: ".$name." is available!";
+	if (strlen($name) < 3) {
+		echo " However, it is too short for a kerb. You can still create a mailing list with that name.";
+	} else if (strlen($name) > 8) {
+		echo " However, it is too long for a kerb. You can still create a mailing list with that name.";
+	} else if (!ctype_lower($name)) {
+		echo " It is strongly recommended to only use lowercase letters in your kerb.";
+	}
 }
 
 ?>
