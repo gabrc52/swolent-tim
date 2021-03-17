@@ -36,6 +36,10 @@ const confessCommand = (msg, args, client) => {
     } else {
         msg.reply("Could not delete message, either the permissions are wrong, or this is a DM channel. Please delete manually.");
     }
+    /// If sent by a webhook (such as NQN), ignore
+    if (msg.webhookID !== undefined) {
+        return;
+    }
     const confession = msg.content.substr(args[0].length + 1);
     const confessor = msg.author.id;
     const guild = client.guilds.cache.get(config.guild_2025);
