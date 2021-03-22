@@ -9,10 +9,12 @@ $name = $_GET["name"];
 $name = preg_replace("/[^a-zA-Z0-9\-_.]+/", "", $name);
 
 $output = [];
-exec("blanche -info -noauth ".$name." 2>&1", $output);
+exec("qy glin ".$name." 2>&1 | tail -n +2", $output);
 
+echo "```\n";
 foreach ($output as $line) {
 	echo $line."\n";
 }
+echo "```\n";
 
 ?>
