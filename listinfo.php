@@ -9,7 +9,7 @@ $name = $_GET["name"];
 $name = preg_replace("/[^a-zA-Z0-9\-_.]+/", "", $name);
 
 $output = [];
-exec("qy glin ".$name." 2>&1 | tail -n +2", $output);
+exec("qy glin -f name,description,ace_name,publicflg,active,modtime,modby ".$name." 2>&1 | tail -n +2", $output);
 
 echo "```\n";
 foreach ($output as $line) {
