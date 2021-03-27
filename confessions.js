@@ -37,15 +37,16 @@ const logConfession = async (number, confession, confessor, msg, client) => {
  * @param {Discord.Client} client 
  */
 
-const confessCommand = (msg, args, client) => {
+const confessCommand = async (msg, args, client) => {
     const confession = msg.content.substr(args[0].length + 1);
     /// If the confession is just a test, don't post it
     if (confession === 'test' || confession === 'testing') {
-        msg.channel.send('Go ahead with your confession, just write your confession instead of `${confession}`');
+        await msg.channel.send(`Go ahead with your confession, just write your confession instead of \`${confession}\``);
+        await msg.delete();
         return;
     }
     if (msg.deletable) {
-        msg.delete();
+        await msg.delete();
     } else if (msg.channel.recipient !== undefined) {
         /// This is a DM channels
         msg.reply("For additional security, please delete your confession and this message asking you to delete your confession");
