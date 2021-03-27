@@ -4,7 +4,7 @@ const sss = require('shamirs-secret-sharing');
 const config = require('./config');
 const verification = require('./verification');
 
-/// Someone pls implement this, I brain't
+/// ENCRYPTION PENDING, WILL BE ADDED AS SOON AS ALL STAFF SEND THEIR PUBLIC KEYS
 /// Accepts the base64 shamir fragment and the public key
 /// Returns an encrypted string (probably base64 as well) with the encrypted shamir fragment
 /// which will be sent through Discord DM
