@@ -31,6 +31,12 @@ const logConfession = async (number, confession, confessor, msg, client) => {
 };
 
 const confessCommand = (msg, args, client) => {
+    const confession = msg.content.substr(args[0].length + 1).trim();
+    /// If the confession is just a test, don't post it
+    if (confession === 'test' || confession === 'testing') {
+        msg.channel.send('Go ahead with your confession, just write your confession instead of `${confession}`');
+        return;
+    }
     if (msg.deletable) {
         msg.delete();
     } else if (msg.channel.recipient !== undefined) {
@@ -42,12 +48,6 @@ const confessCommand = (msg, args, client) => {
     }
     /// If sent by a webhook (such as NQN), ignore
     if (msg.webhookID !== undefined) {
-        return;
-    }
-    const confession = msg.content.substr(args[0].length + 1).trim();
-    /// If the confession is just a test, don't post it
-    if (confession === 'test' || confession === 'testing') {
-        msg.channel.send('Go ahead with your confession, just write your confession instead of `${confession}`');
         return;
     }
     const confessor = msg.author.id;
