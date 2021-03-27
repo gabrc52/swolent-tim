@@ -54,7 +54,7 @@ const confessCommand = async (msg, args, client) => {
         msg.reply("Could not delete message, either the permissions are wrong, or this is a DM channel. Please delete manually.");
     }
     /// If sent by a webhook (such as NQN), ignore
-    if (!msg.webhookID) {
+    if (msg.webhookID) {
         return;
     }
     const confessor = msg.author.id;
