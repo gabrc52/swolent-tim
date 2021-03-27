@@ -31,7 +31,7 @@ const logConfession = async (number, confession, confessor, msg, client) => {
 };
 
 const confessCommand = (msg, args, client) => {
-    const confession = msg.content.substr(args[0].length + 1).trim();
+    const confession = msg.content.substr(args[0].length + 1);
     /// If the confession is just a test, don't post it
     if (confession === 'test' || confession === 'testing') {
         msg.channel.send('Go ahead with your confession, just write your confession instead of `${confession}`');
