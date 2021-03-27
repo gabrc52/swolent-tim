@@ -1,12 +1,10 @@
 module.exports = {
     reaction_threshold: 7,
     embed_color: '#fcaa32',
-    starboard_channel: '790764930684289054', /// MIT 2025
-    // starboard_channel: '791775444302692382', /// Test server
+    starboard_channel: '790764930684289054',
     guild_2025: '783435629186252820',
     verified_role: '789507257124913192',
-    confessions_channel: '819127555911188541', /// MIT 2025
-    // confessions_channel: '820481506492940369', /// Test server
+    confessions_channel: '819127555911188541',
     welcome_channel: '820830137674760202',
     breakout_unassigned_role: '820052377306529874',
     breakout_assigned_role: '820817118097571850',
