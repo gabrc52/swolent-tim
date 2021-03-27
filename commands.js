@@ -63,6 +63,7 @@ module.exports = {
             }
         }
     },
+    'Confess': confessions.confessCommand,
     'confess': confessions.confessCommand,
     'tim.confess': confessions.confessCommand,
     'tim.deconfess': confessions.deconfessCommand,
