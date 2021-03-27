@@ -44,7 +44,12 @@ const confessCommand = (msg, args, client) => {
     if (msg.webhookID !== undefined) {
         return;
     }
-    const confession = msg.content.substr(args[0].length + 1);
+    const confession = msg.content.substr(args[0].length + 1).trim();
+    /// If the confession is just a test, don't post it
+    if (confession === 'test' || confession === 'testing') {
+        msg.channel.send('Go ahead with your confession, just write your confession instead of `${confession}`');
+        return;
+    }
     const confessor = msg.author.id;
     const guild = client.guilds.cache.get(config.guild_2025);
     const channel = guild.channels.resolve(config.confessions_channel);
