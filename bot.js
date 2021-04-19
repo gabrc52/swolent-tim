@@ -1,7 +1,6 @@
 const Discord = require('discord.js');
 const got = require('got');
 const config = require('./config');
-const token = require('./token');
 const commands = require('./commands');
 const starboard = require('./starboard');
 const verification = require('./verification');
@@ -44,4 +43,22 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
     }
 });
 
-client.login(token);
+const token_thunks = [
+	() => process.env["BOT_TOKEN"],
+	() => readFileSync("token.txt"),
+	() => require('./token'),
+];
+
+const get_token = function() {
+	for (const thunk of token_thunks) {
+		try {
+			const value = thunk();
+			if (value) {
+				return value.trim();
+			}
+		} catch (e) {}
+	}
+	throw new Error("Could not find token! Searched in the following locations: $BOT_TOKEN, token.txt, token.js");
+}
+
+client.login(get_token());
