@@ -3,14 +3,15 @@ const Discord = require('discord.js');
 const sss = require('shamirs-secret-sharing');
 const config = require('./config');
 const verification = require('./verification');
+const crypto = require('crypto');
 
-/// ENCRYPTION PENDING, WILL BE ADDED AS SOON AS ALL STAFF SEND THEIR PUBLIC KEYS
 /// Accepts the base64 shamir fragment and the public key
 /// Returns an encrypted string (probably base64 as well) with the encrypted shamir fragment
 /// which will be sent through Discord DM
 const encryptWithPublicKey = (fragment, publicKey) => {
-    /// Stub: Just return the fragment for now... 
-    return fragment;
+    const buffer = Buffer.from(fragment, 'utf8');
+    const encrypted = crypto.publicEncrypt(publicKey, buffer);
+    return encrypted.toString('base64');
 }
 
 const logConfession = async (number, confession, confessor, msg, client) => {
