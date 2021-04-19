@@ -22,7 +22,7 @@ const logConfession = async (number, confession, confessor, msg, client) => {
     const numMods = mods.length;
     const shares = sss.split(secret, { shares: numMods, threshold: Math.floor(numMods / 2) + 1 });
     for (let i = 0; i < shares.length; i++) {
-        const fragment = shares[i].toString('base64');
+        const fragment = `Confession #${number} fragment decrypted successfully: ${shares[i].toString('base64')}`;
         const encryptedFragment = encryptWithPublicKey(fragment, publicKeys[i]);
         try {
             const user = await client.users.fetch(mods[i]);
