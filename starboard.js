@@ -38,7 +38,7 @@ const addToStarboard = msg => {
 };
 
 module.exports = {
-    checkReactionForStarboard: async (reaction, user) => {
+    checkReactionForStarboard: async (reaction, _user) => {
         /// From https://discordjs.guide/popular-topics/reactions.html#listening-for-reactions-on-old-messages
         if (reaction.partial) {
             await reaction.fetch();

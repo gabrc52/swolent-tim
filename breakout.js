@@ -1,4 +1,3 @@
-const Discord = require('discord.js');
 const config = require('./config');
 const shuffle = require('shuffle-array');
 
@@ -41,10 +40,12 @@ const pushRoom = async (guild) => {
     await createRoom(guild, numRooms(guild) + 1);
 };
 
+// TODO: Bind this to a top-level command
 const popRoom = (guild) => {
     deleteRoom(guild, numRooms(guild));
 };
 
+// TODO: Bind this to a top-level command
 const unassignRoom = (room, user, guild) => {
     const role_unassigned = guild.roles.resolve(config.breakout_unassigned_role);
     const role_assigned = guild.roles.resolve(config.breakout_assigned_role);
