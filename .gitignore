@@ -1,6 +1,5 @@
 # NodeJS stuff
 node_modules
-package-lock.json
 
 # The Token
 token.js
