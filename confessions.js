@@ -55,7 +55,6 @@ const confessCommand = async (msg, args, client) => {
         await msg.delete();
     } else if (msg.channel.recipient !== undefined) {
         /// This is a DM channel
-        /// Do nothing
         const reply = await msg.reply("For your security, please delete your confession. This message will self-destruct in 10 seconds.");
         setTimeout(() => reply.delete(), 10000);
     } else {
