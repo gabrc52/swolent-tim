@@ -1,0 +1,25 @@
+{
+  "name": "swolent-tim",
+  "version": "1.0.0",
+  "description": "Discord bot for the MIT 2025 server.",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabrc52/swolent-tim.git"
+  },
+  "author": "gabrc52",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gabrc52/swolent-tim/issues"
+  },
+  "homepage": "https://github.com/gabrc52/swolent-tim#readme",
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "got": "^11.8.2",
+    "shamirs-secret-sharing": "^1.0.1",
+    "shuffle-array": "^1.0.1"
+  }
+}
