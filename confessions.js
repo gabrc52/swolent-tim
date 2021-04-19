@@ -17,7 +17,7 @@ const logConfession = async (number, confession, confessor, msg, client) => {
     const secretStr = `Confession #${number} by ${confessor}: ${confession}`;
     const secret = Buffer.from(secretStr);
     const numMods = config.server_mods.length;
-    const shares = sss.split(secret, { shares: numMods, threshold: Math.ceil(numMods / 2) });
+    const shares = sss.split(secret, { shares: numMods, threshold: Math.floor(numMods / 2) + 1 });
     for (let i = 0; i < shares.length; i++) {
         const fragment = shares[i].toString('base64');
         const encryptedFragment = encryptWithPublicKey(fragment, config.public_keys[i]);
