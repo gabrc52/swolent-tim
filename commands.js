@@ -1,6 +1,4 @@
-const Discord = require('discord.js');
 const got = require('got');
-const config = require('./config');
 const verification = require('./verification');
 const confessions = require('./confessions');
 const breakout = require('./breakout');

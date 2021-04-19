@@ -51,13 +51,11 @@ const confessCommand = async (msg, args, client) => {
     }
     if (msg.deletable) {
         await msg.delete();
-    } else if (msg.channel.recipient !== undefined) {
-        /// This is a DM channel
-        /// Do nothing
+    } else if (msg.channel.type === "dm") {
         const reply = await msg.reply("For your security, please delete your confession. This message will self-destruct in 10 seconds.");
         setTimeout(() => reply.delete(), 10000);
     } else {
-        msg.reply("Could not delete message, either the permissions are wrong, or this is a DM channel. Please delete manually.");
+        msg.reply("Could not delete message-- please delete manually. Are the permissions wrong?");
     }
     /// If sent by a webhook (such as NQN), ignore
     if (msg.webhookID) {
@@ -68,14 +66,8 @@ const confessCommand = async (msg, args, client) => {
     const channel = guild.channels.resolve(config.confessions_channel);
     const verificationStatus = verification.isVerified(confessor, client);
     if (verificationStatus === true) {
-        let number;
         fs.readFile('confession_counter', 'utf8', (err, data) => {
-            if (err) {
-                number = 1;
-            } else {
-                data++;
-                number = data;
-            }
+            let number = 1 + (err ? 0 : +data);
             logConfession(number, confession, confessor, msg, client);
             fs.writeFileSync('confession_counter', number.toString());
             const embed = new Discord.MessageEmbed()
@@ -89,19 +81,19 @@ const confessCommand = async (msg, args, client) => {
     }
 };
 
-const deconfessCommand = (msg, args, client) => {
+const deconfessCommand = (msg, args, _client) => {
     const fragmentStrings = args.slice(1);
     const numMods = config.server_mods.length;
     const neededFragments = Math.ceil(numMods / 2);
     if (fragmentStrings.length < neededFragments) {
-        msg.reply(`Please enter exactly ${neededFragments} deconfession fragments.`);
+        msg.reply(`Please enter at least ${neededFragments} deconfession fragments.`);
     } else {
-        const fragments = fragmentStrings.map((s) => Buffer.from(s, 'base64'));
+        const fragments = fragmentStrings.map(s => Buffer.from(s, 'base64'));
         msg.reply(sss.combine(fragments).toString());
     }
 };
 
 module.exports = {
-    confessCommand: confessCommand,
-    deconfessCommand: deconfessCommand,
+    confessCommand,
+    deconfessCommand,
 };
