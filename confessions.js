@@ -51,6 +51,9 @@ const confessCommand = async (msg, args, client) => {
     }
     if (msg.deletable) {
         await msg.delete();
+    } else if (msg.channel.recipient !== undefined) {
+        /// This is a DM channel
+        /// Do nothing
     } else {
         msg.reply("Could not delete message, either the permissions are wrong, or this is a DM channel. Please delete manually.");
     }
