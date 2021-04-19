@@ -4,6 +4,7 @@ package-lock.json
 
 # The Token
 token.js
+token.txt
 
 # Files created by bot
 starboard
