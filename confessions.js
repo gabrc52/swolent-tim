@@ -24,7 +24,7 @@ const logConfession = async (number, confession, confessor, msg, client) => {
         try {
             const user = await client.users.fetch(config.server_mods[i]);
             user.send(`**Confession #${number}**:\n${encryptedFragment}`);
-        } catch(e) {
+        } catch (e) {
             msg.reply(e);
         }
     }
