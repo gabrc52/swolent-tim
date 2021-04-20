@@ -1,7 +1,9 @@
 module.exports = {
-    reaction_threshold: 7,
-    embed_color: '#fcaa32',
-    starboard_channel: '790764930684289054',
+    starboard: {
+        reaction_threshold: 7,
+        embed_color: '#fcaa32',
+        channel: '790764930684289054',
+    },
     guild_2025: '783435629186252820',
     verified_role: '789507257124913192',
     confessions_channel: '819127555911188541',
