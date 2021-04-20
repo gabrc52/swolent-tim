@@ -70,7 +70,7 @@ const confessCommand = async (client, msg, args) => {
     const guild = client.guilds.cache.get(config.guild_2025);
     const channel = guild.channels.resolve(config.confessions_channel);
     const verificationStatus = verification.isVerified(confessor, client);
-    if (verificationStatus === true) {
+    verificationStatus.then(() => {
         fs.readFile('confession_counter', 'utf8', (err, data) => {
             let number = 1 + (err ? 0 : +data);
             logConfession(number, confession, confessor, msg, client);
@@ -81,9 +81,7 @@ const confessCommand = async (client, msg, args) => {
                 .setDescription(confession);
             channel.send(embed);
         });
-    } else {
-        msg.reply(`Can't confess: ${verificationStatus}`);
-    }
+    }).catch(error => msg.reply(`Can't confess: ${error}`));
 };
 
 const deconfessCommand = (client, msg, args) => {
