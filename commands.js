@@ -2,7 +2,7 @@ const got = require('got');
 const verification = require('./verification');
 const breakout = require('./breakout');
 
-module.exports = client => [
+const setup = client => [
     {
         name: 'verify',
         call: (msg, args) => {
@@ -76,3 +76,4 @@ module.exports = client => [
         }
     }
 ];
+module.exports = {setup};
