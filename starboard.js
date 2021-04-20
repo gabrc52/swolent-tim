@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const fs = require('fs');
 
+// TODO: Migrate this to a persistent db data structure, rather than making the filesystem do it
 const rememberStarboard = msg => {
     /// https://remarkablemark.org/blog/2017/12/17/touch-file-nodejs/
     fs.closeSync(fs.openSync(`starboard/${msg.id}`, 'w'));
@@ -15,12 +16,12 @@ const hasBeenStarboarded = msg => {
     }
 };
 
-const addToStarboard = (msg, channel, color) => {
+const addToStarboard = (msg, channel, config) => {
     const user = msg.member.user;
     const attachments = msg.attachments.array();
     const embeds = msg.embeds;
     const embed = new Discord.MessageEmbed()
-        .setColor(color)
+        .setColor(config.embed_color)
         .setAuthor(user.username, user.avatarURL())
         .setDescription(`${msg.content}`)
         .setFooter(`#${msg.channel.name} • ${msg.createdAt}`)
@@ -28,7 +29,7 @@ const addToStarboard = (msg, channel, color) => {
     if (attachments.length > 0) {
         embed.setImage(attachments[0].proxyURL);
     }
-    if (msg.author.username == 'HaikuBot') {
+    if (config.embed_bots.indexOf(msg.author.id) > -1) {
         embed.setDescription(embeds[0].description);
         embed.setAuthor(embeds[0].footer.text.slice(2), user.avatarURL());
     }
@@ -44,10 +45,10 @@ const starboardReact = async (config, channel, reaction, user) => {
     if (reaction.count >= config.reaction_threshold) {
         switch (reaction.emoji.name) {
         case '⭐':
-            if (hasBeenStarboarded(reaction.message) === false) {
+            if (hasBeenStarboarded(reaction.message)) {
                 console.log(`Starboarding ${reaction.message.id}`);
                 rememberStarboard(reaction.message);
-                addToStarboard(reaction.message, channel, config.embed_color);
+                addToStarboard(reaction.message, channel, config);
             } else {
                 console.log(`Won't starboard ${reaction.message.id} as it has already been starboarded`);
             }
