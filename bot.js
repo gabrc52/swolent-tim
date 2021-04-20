@@ -16,10 +16,11 @@ const command_modules = [require('./commands')];
 client.on('ready', () => {
     for (const module of command_modules) {
         for (const cmd of module(client, config)) {
+            const name = cmd.name.toLowerCase();
             if (cmd.unprefixed) {
-                commands[cmd.name] = cmd.call;
+                commands[name] = cmd.call;
             }
-            commands[prefix + cmd.name] = cmd.call;
+            commands[prefix + name] = cmd.call;
         }
     }
     console.log(`Logged in as ${client.user.tag}!`);
@@ -27,8 +28,9 @@ client.on('ready', () => {
 
 client.on('message', msg => {
     const args = msg.content.split(' ');
-    if (commands[args[0]] !== undefined) {
-        commands[args[0]](msg, args);
+    const target = commands[args[0].toLowerCase()];
+    if (target !== undefined) {
+        target(msg, args);
     }
 });
 
