@@ -8,11 +8,11 @@ const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION']
 const commands = {};
 const prefix = 'tim.';
 
-const modules = [require('./commands'), require('./confessions'), require('./starboard')];
+const modules = ['commands', 'confessions', 'starboard'];
 
 client.on('ready', () => {
-    for (const setup_fn of modules) {
-        const cmds = setup_fn(client, config);
+    for (const module of modules) {
+        const cmds = require('./' + module).setup(client, config);
         if (!cmds) {
             continue;
         }

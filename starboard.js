@@ -60,9 +60,10 @@ const starboardReact = async (config, channel, reaction, user) => {
     }
 };
 
-module.exports = (client, config) => {
+const setup = (client, config) => {
     const sb_config = config.starboard;
     const channel = client.channels.resolve(sb_config.channel);
     client.on('messageReactionAdd', starboardReact.bind(null, sb_config, channel));
     return [];
 };
+module.exports = {setup};
