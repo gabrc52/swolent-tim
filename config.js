@@ -3,6 +3,9 @@ module.exports = {
         reaction_threshold: 7,
         embed_color: '#fcaa32',
         channel: '790764930684289054',
+        embed_bots: [
+            "372175794895585280" // HaikuBot#6950
+        ],
     },
     guild_2025: '783435629186252820',
     verified_role: '789507257124913192',
