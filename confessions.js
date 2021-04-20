@@ -69,7 +69,7 @@ const confessCommand = async (client, msg, args) => {
     const confessor = msg.author.id;
     const guild = client.guilds.cache.get(config.guild_2025);
     const channel = guild.channels.resolve(config.confessions_channel);
-    const verificationStatus = verification.isVerified(confessor, client);
+    const verificationStatus = verification.checkVerified(confessor);
     verificationStatus.then(() => {
         fs.readFile('confession_counter', 'utf8', (err, data) => {
             let number = 1 + (err ? 0 : +data);

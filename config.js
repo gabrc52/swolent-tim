@@ -8,7 +8,14 @@ module.exports = {
         ],
     },
     guild_2025: '783435629186252820',
-    verified_role: '789507257124913192',
+    verification: {
+        // Channel to call people out as unverified in
+        target_channel: 'landing-pad',
+        // Channel to assign to verified people in a given server
+        target_role: 'verified',
+        // MIT 2025 verified role
+        verified_role: '789507257124913192',
+    },
     confessions_channel: '819127555911188541',
     welcome_channel: '820830137674760202',
     breakout_unassigned_role: '820052377306529874',
