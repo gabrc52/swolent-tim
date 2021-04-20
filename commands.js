@@ -1,4 +1,3 @@
-const Discord = require('discord.js');
 const got = require('got');
 const verification = require('./verification');
 const breakout = require('./breakout');
@@ -56,6 +55,7 @@ module.exports = client => [
         call: msg => msg.channel.send(`The working directory is ${process.cwd()}`)
     }, {
         name: 'whitelist',
+        unprefixed: true,
         call: async (msg, args) => {
             if (msg.content.trim() === 'whitelist') {
                 msg.reply("Please specify a username after `whitelist` to get whitelisted");
@@ -63,12 +63,9 @@ module.exports = client => [
                 const username = args[1];
                 const url = `https://rgabriel.scripts.mit.edu/mc/prefrosh.php?name=${username}&discord=${msg.author.id}`;
                 const verificationStatus = verification.isVerified(msg.author.id, client);
-                if (verificationStatus === true) {
-                    const response = await got(url);
-                    msg.channel.send(`${response.body}`);
-                } else {
-                    msg.reply(`${verificationStatus} If you're not a prefrosh, go to https://mitcraft.ml to get whitelisted. Go to #help if you're having trouble.`);
-                }
+                verificationStatus
+                    .then(() => got(url).then(response => msg.channel.send(`${response.body}`)))
+                    .catch(error => msg.reply(`${error} If you're not a prefrosh, go to https://mitcraft.ml to get whitelisted. Go to #help if you're having trouble.`));
             }
         }
     }, {
