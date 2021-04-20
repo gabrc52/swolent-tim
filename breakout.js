@@ -1,4 +1,3 @@
-const Discord = require('discord.js');
 const config = require('./config');
 const shuffle = require('shuffle-array');
 
@@ -9,7 +8,7 @@ const getRoom = (guild, number) => {
 
 const createRoom = async (guild, number) => {
     const name = `room-${number}`;
-    if (getRoom(guild, number) === undefined) {
+    if (!getRoom(guild, number)) {
         const category = guild.channels.resolve(config.breakout_category);
         await guild.channels.create(name, {
             topic: `Small chat #${number}: hang out with 10 other people! :D`,
@@ -20,31 +19,33 @@ const createRoom = async (guild, number) => {
 
 const deleteRoom = async (guild, number) => {
     const room = getRoom(guild, number);
-    if (room !== undefined) {
+    if (room) {
         await room.delete();
     }
 };
 
-const numRooms = (guild) => {
+const numRooms = guild => {
     for (let i = 1; ; i++) {
-        if (getRoom(guild, i) === undefined) {
+        if (!getRoom(guild, i)) {
             return i - 1;
         }
     }
 };
 
-const topRoom = (guild) => {
+const topRoom = guild => {
     return getRoom(guild, numRooms(guild));
 };
 
-const pushRoom = async (guild) => {
-    await createRoom(guild, numRooms(guild) + 1);
+const pushRoom = guild => {
+    return createRoom(guild, numRooms(guild) + 1);
 };
 
-const popRoom = (guild) => {
+// TODO: Bind this to a top-level command
+const popRoom = guild => {
     deleteRoom(guild, numRooms(guild));
 };
 
+// TODO: Bind this to a top-level command
 const unassignRoom = (room, user, guild) => {
     const role_unassigned = guild.roles.resolve(config.breakout_unassigned_role);
     const role_assigned = guild.roles.resolve(config.breakout_assigned_role);
@@ -54,12 +55,12 @@ const unassignRoom = (room, user, guild) => {
     guildMember.roles.add(role_unassigned);
 };
 
-const sizeOfRoom = (room) => {
+const sizeOfRoom = room => {
     const inRoom = overwrite => overwrite.type === 'member' && overwrite.allow.has('VIEW_CHANNEL');
     return room.permissionOverwrites.filter(inRoom).size;
 };
 
-const isFull = (room) => {
+const isFull = room => {
     return sizeOfRoom(room) >= config.breakout_room_size;
 };
 
@@ -67,7 +68,7 @@ const assignToRoom = async (user, guild) => {
     if (numRooms(guild) === 0 || isFull(topRoom(guild))) {
         await pushRoom(guild);
     }
-    if (topRoom(guild) === undefined) {
+    if (!topRoom(guild)) {
         console.log('Aaaaah room is undefined');
         return;
     }
@@ -89,7 +90,7 @@ const assignToRoom = async (user, guild) => {
  * Fills breakout rooms
  * @param {Discord.Client} client
  */
-const fillBreakoutRooms = async (client) => {
+const fillBreakoutRooms = async client => {
     const guild = client.guilds.cache.get(config.guild_2025);
     const role_unassigned = guild.roles.resolve(config.breakout_unassigned_role);
     const unassignedPeople = role_unassigned.members.map(member => member.user.id);
