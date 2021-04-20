@@ -40,7 +40,8 @@ const logConfession = async (number, confession, confessor, msg, client) => {
  * @param {Discord.Client} client 
  */
 
-const confessCommand = async (msg, args, client) => {
+const confessCommand = async (client, msg, args) => {
+    // TODO: Move this body into a class so we can persist some state
     let confession = msg.content.substr(args[0].length + 1).trim();
     /// Remove brackets
     if (confession[0] === '[' && confession[confession.length - 1] === ']') {
@@ -85,7 +86,7 @@ const confessCommand = async (msg, args, client) => {
     }
 };
 
-const deconfessCommand = (msg, args, _client) => {
+const deconfessCommand = (client, msg, args) => {
     const fragmentStrings = args.slice(1);
     const numMods = config.server_mods.length;
     const neededFragments = Math.ceil(numMods / 2);
@@ -97,7 +98,13 @@ const deconfessCommand = (msg, args, _client) => {
     }
 };
 
-module.exports = {
-    confessCommand,
-    deconfessCommand,
-};
+module.exports = (client, config) => [
+    {
+        name: 'confess',
+        unprefixed: true,
+        call: confessCommand.bind(null, client),
+    }, {
+        name: 'deconfess',
+        call: deconfessCommand.bind(null, client),
+    }
+];
