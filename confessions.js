@@ -96,7 +96,7 @@ const deconfessCommand = (client, msg, args) => {
     }
 };
 
-module.exports = (client, config) => [
+const setup = (client, config) => [
     {
         name: 'confess',
         unprefixed: true,
@@ -106,3 +106,4 @@ module.exports = (client, config) => [
         call: deconfessCommand.bind(null, client),
     }
 ];
+module.exports = {setup};
