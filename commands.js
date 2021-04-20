@@ -1,12 +1,11 @@
 const Discord = require('discord.js');
 const got = require('got');
-const config = require('./config');
 const verification = require('./verification');
 const confessions = require('./confessions');
 const breakout = require('./breakout');
 
-module.exports = {
-    'tim.verify': (msg, args, client) => {
+module.exports = client => ({
+    'tim.verify': (msg, args) => {
         const guildMember = msg.guild.members.cache.get(msg.author.id);
         verification.verify(guildMember, client);
     },
@@ -48,7 +47,7 @@ module.exports = {
     'tim.cwd': msg => {
         msg.channel.send(`The working directory is ${process.cwd()}`);
     },
-    'whitelist': async (msg, args, client) => {
+    'whitelist': async (msg, args) => {
         if (msg.content.trim() === 'whitelist') {
             msg.reply("Please specify a username after `whitelist` to get whitelisted");
         } else {
@@ -67,8 +66,8 @@ module.exports = {
     'confess': confessions.confessCommand,
     'tim.confess': confessions.confessCommand,
     'tim.deconfess': confessions.deconfessCommand,
-    'tim.fillTheBreakoutRooms': async (msg, args, client) => {
+    'tim.fillTheBreakoutRooms': async (msg, args) => {
         msg.reply('Ok, filling breakout rooms...');
         await breakout.fillBreakoutRooms(client);
     },
-};
+});
