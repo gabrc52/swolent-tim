@@ -1,16 +1,16 @@
 const config = require('./config');
 
-const isVerified = (id, client) => {
+// We use a promise here because it's the closest thing JS has to an either type.
+// It's better than polymorphing on string vs true, at least?
+const isVerified = async (id, client) => {
     const guild = client.guilds.cache.get(config.guild_2025);
     const guildMember = guild.members.cache.get(id);
-    if (guildMember === undefined) {
-        return "You're not in the MIT 2025 server."
+    if (!guildMember) {
+        throw "You're not in the MIT 2025 server."
     } else {
         const role = guildMember.roles.cache.get(config.verified_role);
-        if (role === undefined) {
-            return "Swole Tim hasn't verified you in the MIT 2025 server. Please follow the instructions to verify there."
-        } else {
-            return true;
+        if (!role) {
+            throw "Swole Tim hasn't verified you in the MIT 2025 server. Please follow the instructions to verify there."
         }
     }
 };
@@ -23,16 +23,16 @@ const verify = (guildMember, client) => {
     if (!channel) {
         return;
     }
-    if (verification === true) {
+    verification.then(() => {
         const verifiedRole = guild.roles.cache.find(r => r.name === 'verified');
-        if (verifiedRole === undefined) {
+        if (!verifiedRole) {
             channel.send(`Could not find verified role in ${guild.name}`);
         } else {
             guildMember.roles.add(verifiedRole);
         }
-    } else {
-        channel.send(`${guildMember}: ${verification}`);
-    }
+    }).catch(error => {
+        channel.send(`${guildMember}: ${error}`);
+    });
 };
 
 module.exports = {
