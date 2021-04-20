@@ -1,7 +1,6 @@
 const Discord = require('discord.js');
 const got = require('got');
 const verification = require('./verification');
-const confessions = require('./confessions');
 const breakout = require('./breakout');
 
 module.exports = client => [
@@ -72,13 +71,6 @@ module.exports = client => [
                 }
             }
         }
-    }, {
-        name: 'confess',
-        unprefixed: true,
-        call: confessions.confessCommand,
-    }, {
-        name: 'deconfess',
-        call: confessions.deconfessCommand,
     }, {
         name: 'fillTheBreakoutRooms',
         call: async (msg, args) => {
