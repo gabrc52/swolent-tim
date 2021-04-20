@@ -2,22 +2,28 @@ const Discord = require('discord.js');
 const got = require('got');
 const config = require('./config');
 const token = require('./token');
-const commands = require('./commands');
 const starboard = require('./starboard');
 const verification = require('./verification');
 const breakout = require('./breakout');
 
 /// From https://discordjs.guide/popular-topics/reactions.html#awaiting-reactions
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
+const commands = {};
+
+const command_modules = [require('./commands')];
 
 client.on('ready', () => {
+    for (const module of command_modules) {
+        const addCommands = module(client, config);
+        Object.assign(commands, addCommands);
+    }
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
 client.on('message', msg => {
     const args = msg.content.split(' ');
     if (commands[args[0]] !== undefined) {
-        commands[args[0]](msg, args, client);
+        commands[args[0]](msg, args);
     }
 });
 
