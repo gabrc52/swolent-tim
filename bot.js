@@ -9,13 +9,18 @@ const breakout = require('./breakout');
 /// From https://discordjs.guide/popular-topics/reactions.html#awaiting-reactions
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
 const commands = {};
+const prefix = 'tim.';
 
 const command_modules = [require('./commands')];
 
 client.on('ready', () => {
     for (const module of command_modules) {
-        const addCommands = module(client, config);
-        Object.assign(commands, addCommands);
+        for (const cmd of module(client, config)) {
+            if (cmd.unprefixed) {
+                commands[cmd.name] = cmd.call;
+            }
+            commands[prefix + cmd.name] = cmd.call;
+        }
     }
     console.log(`Logged in as ${client.user.tag}!`);
 });
