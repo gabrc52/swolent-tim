@@ -11,7 +11,7 @@ const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION']
 const commands = {};
 const prefix = 'tim.';
 
-const command_modules = [require('./commands')];
+const command_modules = [require('./commands'), require('./confessions')];
 
 client.on('ready', () => {
     for (const module of command_modules) {
