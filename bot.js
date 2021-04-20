@@ -15,8 +15,9 @@ client.on('ready', () => {
 
 client.on('message', msg => {
     const args = msg.content.split(' ');
-    if (commands[args[0]] !== undefined) {
-        commands[args[0]](msg, args, client);
+    const command = commands[args[0]];
+    if (command) {
+        command(msg, args, client);
     }
 });
 
@@ -29,7 +30,7 @@ client.on('messageReactionAdd', starboard.checkReactionForStarboard);
 client.on('guildMemberUpdate', (oldMember, newMember) => {
     const guild = client.guilds.cache.get(config.guild_2025);
 
-    const wasGivenRole = role => oldMember.roles.cache.get(role) === undefined && newMember.roles.cache.get(role) !== undefined;
+    const wasGivenRole = role => !oldMember.roles.cache.get(role) && newMember.roles.cache.get(role);
 
     if (newMember.guild == guild) {
         if (wasGivenRole(config.verified_role)) {
@@ -37,7 +38,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
             const user = newMember.user;
             channel.send(`${user}, welcome to MIT '25! Please head over to <#783439183888384031> to get tags for pronouns, regions, etc., and if you're new to Discord, <#789592290518892545> will explain how to use this platform! Then you can introduce yourself in <#786487633928650813>. Congratulations again! <:bbydab:784988174647558145> :confetti_ball:\n\nP.S. We have some special guests here (current students and folks from the admissions office)! Say hi in <#783818929961173002> or in this channel :smile: (the server is still ours tho, they can only access the Boomer chats, not all other chats for their own safety)!!`);
         }
-        if (wasGivenRole(config.breakout_unassigned_role) && oldMember.roles.cache.get(config.breakout_assigned_role) === undefined) {
+        if (wasGivenRole(config.breakout_unassigned_role) && !oldMember.roles.cache.get(config.breakout_assigned_role)) {
             breakout.assignToRoom(newMember.user.id, guild);
         }
     }
