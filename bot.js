@@ -2,7 +2,6 @@ const Discord = require('discord.js');
 const got = require('got');
 const config = require('./config');
 const token = require('./token');
-const starboard = require('./starboard');
 const verification = require('./verification');
 const breakout = require('./breakout');
 
@@ -11,11 +10,15 @@ const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION']
 const commands = {};
 const prefix = 'tim.';
 
-const command_modules = [require('./commands'), require('./confessions')];
+const modules = [require('./commands'), require('./confessions'), require('./starboard')];
 
 client.on('ready', () => {
-    for (const module of command_modules) {
-        for (const cmd of module(client, config)) {
+    for (const setup_fn of modules) {
+        const cmds = setup_fn(client, config);
+        if (!cmds) {
+            continue;
+        }
+        for (const cmd of cmds) {
             const name = cmd.name.toLowerCase();
             if (cmd.unprefixed) {
                 commands[name] = cmd.call;
@@ -37,8 +40,6 @@ client.on('message', msg => {
 client.on('guildMemberAdd', guildMember => {
     verification.verify(guildMember, client);
 });
-
-client.on('messageReactionAdd', starboard.checkReactionForStarboard);
 
 client.on('guildMemberUpdate', (oldMember, newMember) => {
     const guild = client.guilds.cache.get(config.guild_2025);
