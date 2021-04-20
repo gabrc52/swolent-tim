@@ -29,7 +29,7 @@ client.on('messageReactionAdd', starboard.checkReactionForStarboard);
 client.on('guildMemberUpdate', (oldMember, newMember) => {
     const guild = client.guilds.cache.get(config.guild_2025);
 
-    const wasGivenRole = (role) => oldMember.roles.cache.get(role) === undefined && newMember.roles.cache.get(role) !== undefined;
+    const wasGivenRole = role => oldMember.roles.cache.get(role) === undefined && newMember.roles.cache.get(role) !== undefined;
 
     if (newMember.guild == guild) {
         if (wasGivenRole(config.verified_role)) {
