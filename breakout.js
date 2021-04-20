@@ -24,7 +24,7 @@ const deleteRoom = async (guild, number) => {
     }
 };
 
-const numRooms = (guild) => {
+const numRooms = guild => {
     for (let i = 1; ; i++) {
         if (getRoom(guild, i) === undefined) {
             return i - 1;
@@ -32,16 +32,16 @@ const numRooms = (guild) => {
     }
 };
 
-const topRoom = (guild) => {
+const topRoom = guild => {
     return getRoom(guild, numRooms(guild));
 };
 
-const pushRoom = async (guild) => {
-    await createRoom(guild, numRooms(guild) + 1);
+const pushRoom = guild => {
+    return createRoom(guild, numRooms(guild) + 1);
 };
 
 // TODO: Bind this to a top-level command
-const popRoom = (guild) => {
+const popRoom = guild => {
     deleteRoom(guild, numRooms(guild));
 };
 
@@ -55,12 +55,12 @@ const unassignRoom = (room, user, guild) => {
     guildMember.roles.add(role_unassigned);
 };
 
-const sizeOfRoom = (room) => {
+const sizeOfRoom = room => {
     const inRoom = overwrite => overwrite.type === 'member' && overwrite.allow.has('VIEW_CHANNEL');
     return room.permissionOverwrites.filter(inRoom).size;
 };
 
-const isFull = (room) => {
+const isFull = room => {
     return sizeOfRoom(room) >= config.breakout_room_size;
 };
 
@@ -90,7 +90,7 @@ const assignToRoom = async (user, guild) => {
  * Fills breakout rooms
  * @param {Discord.Client} client
  */
-const fillBreakoutRooms = async (client) => {
+const fillBreakoutRooms = async client => {
     const guild = client.guilds.cache.get(config.guild_2025);
     const role_unassigned = guild.roles.resolve(config.breakout_unassigned_role);
     const unassignedPeople = role_unassigned.members.map(member => member.user.id);
