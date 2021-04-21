@@ -5,7 +5,7 @@ const breakout = require('./breakout');
 const setup = client => [
     {
         name: 'verify',
-        call: (msg, args) => {
+        call: msg => {
             const guildMember = msg.guild.members.cache.get(msg.author.id);
             verification.verify(guildMember, client);
         }
@@ -55,6 +55,7 @@ const setup = client => [
         call: msg => msg.channel.send(`The working directory is ${process.cwd()}`)
     }, {
         name: 'whitelist',
+        unprefixed: true,
         call: async (msg, args) => {
             if (msg.content.trim() === 'whitelist') {
                 msg.reply("Please specify a username after `whitelist` to get whitelisted");
@@ -69,7 +70,7 @@ const setup = client => [
         }
     }, {
         name: 'fillTheBreakoutRooms',
-        call: async (msg, args) => {
+        call: async msg => {
             msg.reply('Ok, filling breakout rooms...');
             await breakout.fillBreakoutRooms(client);
         }
