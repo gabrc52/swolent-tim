@@ -2,6 +2,7 @@ const got = require('got');
 const verification = require('./verification');
 const confessions = require('./confessions');
 const breakout = require('./breakout');
+const { exec } = require("child_process");
 
 module.exports = {
     'tim.verify': (msg, args, client) => {
@@ -68,5 +69,14 @@ module.exports = {
     'tim.fillTheBreakoutRooms': async (msg, args, client) => {
         msg.reply('Ok, filling breakout rooms...');
         await breakout.fillBreakoutRooms(client);
+    },
+    'tim.revision': (msg, _args, _client) => {
+        exec('git rev-parse HEAD', (error, stdout, stderr) => {
+            if (error) {
+                msg.reply(`Error getting revision:\n${stderr}`);
+            } else {
+                msg.reply(stdout.substr(0, 7));
+            }
+        });
     },
 };
