@@ -15,7 +15,7 @@ const encryptWithPublicKey = (fragment, publicKey) => {
 }
 
 const logConfession = async (number, confession, confessor, msg, client) => {
-    const secretStr = `Confession #${number} by ${confessor}: ${confession}`;
+    const secretStr = `Confession #${number} by ${confessor}`;
     const secret = Buffer.from(secretStr);
     const mods = Object.keys(config.server_mods);
     const publicKeys = Object.values(config.server_mods);
@@ -26,7 +26,7 @@ const logConfession = async (number, confession, confessor, msg, client) => {
         const encryptedFragment = encryptWithPublicKey(fragment, publicKeys[i]);
         try {
             const user = await client.users.fetch(mods[i]);
-            user.send(`**Confession #${number}**:\n${encryptedFragment}`);
+            user.send(`**Confession #${number}**:\n${confession}\n${encryptedFragment}`);
         } catch (e) {
             msg.reply(e);
         }
