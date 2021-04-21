@@ -36,7 +36,7 @@ const addToStarboard = (msg, channel, config) => {
     channel.send(embed);
 };
 
-const starboardReact = async (config, channel, reaction, user) => {
+const starboardReact = async (config, channel, reaction, _user) => {
     /// From https://discordjs.guide/popular-topics/reactions.html#listening-for-reactions-on-old-messages
     if (reaction.partial) {
         await reaction.fetch();

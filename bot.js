@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const config = require('./config');
 const verification = require('./verification');
 const breakout = require('./breakout');
+const {readFileSync} = require('fs');
 
 /// From https://discordjs.guide/popular-topics/reactions.html#awaiting-reactions
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
@@ -67,7 +68,7 @@ const get_token = function() {
 		try {
 			const value = thunk();
 			if (value) {
-				return value.trim();
+				return value.toString().trim();
 			}
 		} catch (e) {}
 	}

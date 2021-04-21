@@ -96,7 +96,7 @@ const deconfessCommand = (client, msg, args) => {
     }
 };
 
-const setup = (client, config) => [
+const setup = (client, _config) => [
     {
         name: 'confess',
         unprefixed: true,
