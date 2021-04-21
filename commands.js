@@ -1,6 +1,7 @@
 const got = require('got');
 const verification = require('./verification');
 const breakout = require('./breakout');
+const { exec } = require("child_process");
 
 const setup = client => [
     {
@@ -17,7 +18,7 @@ const setup = client => [
     }, {
         name: 'taken',
         call: async (msg, args) => {
-            if (msg.content.trim() === 'tim.taken') {
+            if (!args[1]) {
                 msg.reply("Please specify a possible kerb to know if it's taken or not (for example: `tim.taken stress`).");
             } else {
                 const possibleUser = args[1];
@@ -57,7 +58,7 @@ const setup = client => [
         name: 'whitelist',
         unprefixed: true,
         call: async (msg, args) => {
-            if (msg.content.trim() === 'whitelist') {
+            if (!args[1]) {
                 msg.reply("Please specify a username after `whitelist` to get whitelisted");
             } else {
                 const username = args[1];
@@ -73,6 +74,18 @@ const setup = client => [
         call: async msg => {
             msg.reply('Ok, filling breakout rooms...');
             await breakout.fillBreakoutRooms(client);
+        }
+    }, {
+        name: 'revision',
+        call: msg => {
+            // TODO: Pull in a git lib or parse .git/HEAD by hand? Summoning ref by hand is dangerous
+            exec('git rev-parse HEAD', (error, stdout, stderr) => {
+                if (error) {
+                    msg.reply(`Error getting revision:\n${stderr}`);
+                } else {
+                    msg.reply(stdout.substr(0, 7));
+                }
+            });
         }
     }
 ];
