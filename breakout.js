@@ -8,7 +8,7 @@ const getRoom = (guild, number) => {
 
 const createRoom = async (guild, number) => {
     const name = `room-${number}`;
-    if (getRoom(guild, number) === undefined) {
+    if (!getRoom(guild, number)) {
         const category = guild.channels.resolve(config.breakout_category);
         await guild.channels.create(name, {
             topic: `Small chat #${number}: hang out with 10 other people! :D`,
@@ -19,14 +19,14 @@ const createRoom = async (guild, number) => {
 
 const deleteRoom = async (guild, number) => {
     const room = getRoom(guild, number);
-    if (room !== undefined) {
+    if (room) {
         await room.delete();
     }
 };
 
 const numRooms = guild => {
     for (let i = 1; ; i++) {
-        if (getRoom(guild, i) === undefined) {
+        if (!getRoom(guild, i)) {
             return i - 1;
         }
     }
@@ -68,7 +68,7 @@ const assignToRoom = async (user, guild) => {
     if (numRooms(guild) === 0 || isFull(topRoom(guild))) {
         await pushRoom(guild);
     }
-    if (topRoom(guild) === undefined) {
+    if (!topRoom(guild)) {
         console.log('Aaaaah room is undefined');
         return;
     }
