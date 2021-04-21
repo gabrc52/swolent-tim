@@ -3,6 +3,7 @@ node_modules
 
 # The Token
 token.js
+token.txt
 
 # Files created by bot
 starboard
