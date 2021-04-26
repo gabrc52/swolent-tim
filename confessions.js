@@ -89,6 +89,10 @@ const confessCommand = (msg, args, client) => {
     sendConfession(msg, args, client, config.confessions_channel);
 }
 
+const boomerConfessCommand = (msg, args, client) => {
+    sendConfession(msg, args, client, config.boomer_confessions_channel);
+}
+
 const deconfessCommand = (msg, args, _client) => {
     const fragmentStrings = args.slice(1);
     const numMods = config.server_mods.length;
@@ -103,5 +107,6 @@ const deconfessCommand = (msg, args, _client) => {
 
 module.exports = {
     confessCommand,
+    boomerConfessCommand,
     deconfessCommand,
 };
