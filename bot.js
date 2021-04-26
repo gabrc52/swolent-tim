@@ -14,7 +14,8 @@ client.on('ready', () => {
 
 client.on('message', msg => {
     const args = msg.content.split(' ');
-    const command = commands[args[0]];
+    const commandName = args[0].toLowerCase();
+    const command = commands[commandName];
     if (command) {
         command(msg, args, client);
     }
