@@ -77,7 +77,7 @@ const sendConfession = async (msg, args, client, channelId, confessionType) => {
             logConfession(number, confession, confessor, msg, client, confessionType);
             fs.writeFileSync(fileName, number.toString());
             const embed = new Discord.MessageEmbed()
-                .setAuthor(`Confession #${number}`)
+                .setAuthor(`${confessionType} #${number}`)
                 .setColor(config.embed_color)
                 .setDescription(confession);
             channel.send(embed);
