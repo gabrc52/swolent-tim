@@ -61,8 +61,6 @@ module.exports = {
     },
     'confess': confessions.confessCommand,
     'boomerconfess': confessions.boomerConfessCommand,
-    'c': confessions.confessCommand,
-    'bc': confessions.boomerConfessCommand,
     'tim.confess': confessions.confessCommand,
     'tim.deconfess': confessions.deconfessCommand,
     'tim.fillTheBreakoutRooms': async (msg, args, client) => {
