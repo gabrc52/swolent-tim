@@ -80,7 +80,7 @@ const sendConfession = async (msg, args, client, channelId, confessionType) => {
             //     .setAuthor(`${confessionType} #${number}`)
             //     .setColor(config.embed_color)
             //     .setDescription(confession);
-            const confessionMsg = `${number}: ${confession}`;
+            const confessionMsg = `#${number}: ${confession}`;
             channel.send(confessionMsg);
         });
     }).catch(error => msg.reply(`Can't confess: ${error}`));
