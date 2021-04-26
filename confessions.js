@@ -41,7 +41,7 @@ const logConfession = async (number, confession, confessor, msg, client, confess
  * @param {Discord.Client} client 
  */
 
-const sendConfession = async (msg, args, client, channelId) => {
+const sendConfession = async (msg, args, client, channelId, confessionType) => {
     let confession = msg.content.substr(args[0].length + 1).trim();
     /// Remove brackets
     if (confession[0] === '[' && confession[confession.length - 1] === ']') {
@@ -74,7 +74,7 @@ const sendConfession = async (msg, args, client, channelId) => {
         const fileName = `confession_counter_${channelId}`;
         fs.readFile(fileName, 'utf8', (err, data) => {
             let number = 1 + (err ? 0 : +data);
-            logConfession(number, confession, confessor, msg, client);
+            logConfession(number, confession, confessor, msg, client, confessionType);
             fs.writeFileSync(fileName, number.toString());
             const embed = new Discord.MessageEmbed()
                 .setAuthor(`Confession #${number}`)
@@ -86,11 +86,11 @@ const sendConfession = async (msg, args, client, channelId) => {
 };
 
 const confessCommand = (msg, args, client) => {
-    sendConfession(msg, args, client, config.confessions_channel);
+    sendConfession(msg, args, client, config.confessions_channel, 'Confession');
 }
 
 const boomerConfessCommand = (msg, args, client) => {
-    sendConfession(msg, args, client, config.boomer_confessions_channel);
+    sendConfession(msg, args, client, config.boomer_confessions_channel, 'Confession w/boomers');
 }
 
 const deconfessCommand = (msg, args, _client) => {
