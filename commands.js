@@ -59,7 +59,6 @@ module.exports = {
                 .catch(error => msg.reply(`${error} If you're not a prefrosh, go to https://mitcraft.ml to get whitelisted. Go to #help if you're having trouble.`));
         }
     },
-    'Confess': confessions.confessCommand,
     'confess': confessions.confessCommand,
     'boomerconfess': confessions.boomerConfessCommand,
     'tim.confess': confessions.confessCommand,
