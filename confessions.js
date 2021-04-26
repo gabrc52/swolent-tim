@@ -76,11 +76,12 @@ const sendConfession = async (msg, args, client, channelId, confessionType) => {
             let number = 1 + (err ? 0 : +data);
             logConfession(number, confession, confessor, msg, client, confessionType);
             fs.writeFileSync(fileName, number.toString());
-            const embed = new Discord.MessageEmbed()
-                .setAuthor(`${confessionType} #${number}`)
-                .setColor(config.embed_color)
-                .setDescription(confession);
-            channel.send(embed);
+            // const confessionMsg = new Discord.MessageEmbed()
+            //     .setAuthor(`${confessionType} #${number}`)
+            //     .setColor(config.embed_color)
+            //     .setDescription(confession);
+            const confessionMsg = `${number}: ${confession}`;
+            channel.send(confessionMsg);
         });
     }).catch(error => msg.reply(`Can't confess: ${error}`));
 };
