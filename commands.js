@@ -16,14 +16,18 @@ module.exports = {
         if (msg.content.trim() === 'tim.taken') {
             msg.reply("Please specify a possible kerb to know if it's taken or not (for example: `tim.taken stress`).");
         } else {
-            const possibleUser = args[1];
-            /// https://www.twilio.com/blog/5-ways-to-make-http-requests-in-node-js-using-async-await
-            try {
-                const response = await got(`https://rgabriel.scripts.mit.edu/taken.php?name=${possibleUser}`);
-                msg.channel.send(`${response.body}`);
-            } catch (e) {
-                console.error(`${e}`);
-                msg.channel.send(`${e}`);
+            if (msg.channel.type === 'dm' || msg.channel.name.includes('bot')) {
+                const possibleUser = args[1];
+                /// https://www.twilio.com/blog/5-ways-to-make-http-requests-in-node-js-using-async-await
+                try {
+                    const response = await got(`https://rgabriel.scripts.mit.edu/taken.php?name=${possibleUser}`);
+                    msg.channel.send(`${response.body}`);
+                } catch (e) {
+                    console.error(`${e}`);
+                    msg.channel.send(`${e}`);
+                }
+            } else {
+                msg.reply(`Please take kerb checking to <#788807776812924949> or <#783443258789330965>.`);
             }
         }
     },
