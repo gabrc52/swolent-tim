@@ -42,6 +42,7 @@ const logConfession = async (number, confession, confessor, msg, client, confess
  */
 
 const confessCommand = async (client, channel, confessionType, msg, args) => {
+    // TODO: Move this body into a class so we can persist some state
     let confession = msg.content.substr(args[0].length + 1).trim();
     /// Remove brackets
     if (confession[0] === '[' && confession[confession.length - 1] === ']') {
@@ -67,7 +68,7 @@ const confessCommand = async (client, channel, confessionType, msg, args) => {
         return;
     }
     const confessor = msg.author.id;
-    const verificationStatus = verification.isVerified(confessor, client);
+    const verificationStatus = verification.checkVerified(confessor);
     verificationStatus.then(() => {
         const fileName = `confession_counter_${channel.id}`;
         fs.readFile(fileName, 'utf8', (err, data) => {

@@ -1,16 +1,9 @@
 const got = require('got');
-const verification = require('./verification');
 const breakout = require('./breakout');
 const { exec } = require("child_process");
 
 const setup = client => [
     {
-        name: 'verify',
-        call: msg => {
-            const guildMember = msg.guild.members.cache.get(msg.author.id);
-            verification.verify(guildMember, client);
-        }
-    }, {
         name: 'ping',
         call: msg => {
             msg.channel.send(`Pong, ${msg.author}! The channel is ${msg.channel}.`);
@@ -60,23 +53,8 @@ const setup = client => [
         name: 'cwd',
         call: msg => msg.channel.send(`The working directory is ${process.cwd()}`)
     }, {
-        name: 'whitelist',
-        unprefixed: true,
-        call: async (msg, args) => {
-            if (!args[1]) {
-                msg.reply("Please specify a username after `whitelist` to get whitelisted");
-            } else {
-                const username = args[1];
-                const url = `https://rgabriel.scripts.mit.edu/mc/prefrosh.php?name=${username}&discord=${msg.author.id}`;
-                const verificationStatus = verification.isVerified(msg.author.id, client);
-                verificationStatus
-                    .then(() => got(url).then(response => msg.channel.send(`${response.body}`)))
-                    .catch(error => msg.reply(`${error} If you're not a prefrosh, go to https://mitcraft.ml to get whitelisted. Go to #help if you're having trouble.`));
-            }
-        }
-    }, {
         name: 'fillTheBreakoutRooms',
-        call: async msg => {
+        call: async (msg, args) => {
             msg.reply('Ok, filling breakout rooms...');
             await breakout.fillBreakoutRooms(client);
         }
