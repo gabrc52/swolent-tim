@@ -10,6 +10,7 @@ module.exports = {
     guild_2025: '783435629186252820',
     verified_role: '789507257124913192',
     confessions_channel: '819127555911188541',
+    boomer_confessions_channel: '836071068175171606',
     welcome_channel: '820830137674760202',
     breakout_unassigned_role: '820052377306529874',
     breakout_assigned_role: '820817118097571850',

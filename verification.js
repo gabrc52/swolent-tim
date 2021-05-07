@@ -19,19 +19,19 @@ const verify = (guildMember, client) => {
     const guild = guildMember.guild;
     const verification = isVerified(guildMember.id, client);
     const channel = guild.channels.cache.find(c => c.name === 'landing-pad');
-    /// Don't try to verify if #landing-pad doesn't exist
-    if (!channel) {
-        return;
-    }
     verification.then(() => {
         const verifiedRole = guild.roles.cache.find(r => r.name === 'verified');
         if (!verifiedRole) {
-            channel.send(`Could not find verified role in ${guild.name}`);
+            if (channel) {
+                channel.send(`Could not find verified role in ${guild.name}`);
+            }
         } else {
             guildMember.roles.add(verifiedRole);
         }
     }).catch(error => {
-        channel.send(`${guildMember}: ${error}`);
+        if (channel) {
+            channel.send(`${guildMember}: ${error}`);
+        }
     });
 };
 
