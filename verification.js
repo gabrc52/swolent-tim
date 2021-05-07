@@ -101,5 +101,5 @@ const setup = (client, config) => {
 };
 module.exports = {
     setup,
-    checkVerified: id => verifier.checkVerified(id),
+    Verifier,
 };
