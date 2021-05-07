@@ -1,6 +1,5 @@
 const Discord = require('discord.js');
 const config = require('./config');
-const token = require('./token');
 const breakout = require('./breakout');
 const {readFileSync} = require('fs');
 
