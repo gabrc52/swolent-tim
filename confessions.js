@@ -101,11 +101,11 @@ const setup = (client, config) => [
     {
         name: 'confess',
         unprefixed: true,
-        call: confessCommand.bind(null, client, client.channels.get(config.confessions_channel), 'Confession'),
+        call: confessCommand.bind(null, client, client.channels.resolve(config.confessions_channel), 'Confession'),
     }, {
         name: 'boomerconfess',
         unprefixed: true,
-        call: confessCommand.bind(null, client, client.channels.get(config.boomer_confessions_channel), 'Confession w/ boomers'),
+        call: confessCommand.bind(null, client, client.channels.resolve(config.boomer_confessions_channel), 'Confession w/ boomers'),
     }, {
         name: 'deconfess',
         call: deconfessCommand.bind(null, client),
