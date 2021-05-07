@@ -3,10 +3,11 @@ node_modules
 
 # The Token
 token.js
+token.txt
 
 # Files created by bot
 starboard
-confession_counter
+confession_counter_*
 
 # Role Assignment script (as it contains sensitive Discord IDs)
 role-assign.js

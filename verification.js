@@ -75,7 +75,7 @@ const genCommands = verifier => [
         name: 'whitelist',
         unprefixed: true,
         call: (msg, args) => {
-            if (msg.content.trim() === 'whitelist') {
+            if (!args[1]) {
                 msg.reply("Please specify a username after `whitelist` to get whitelisted");
             } else {
                 const username = args[1];

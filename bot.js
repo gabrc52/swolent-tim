@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const config = require('./config');
 const token = require('./token');
 const breakout = require('./breakout');
+const {readFileSync} = require('fs');
 
 /// From https://discordjs.guide/popular-topics/reactions.html#awaiting-reactions
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
@@ -29,7 +30,8 @@ client.on('ready', () => {
 
 client.on('message', msg => {
     const args = msg.content.split(' ');
-    const command = commands[args[0].toLowerCase()];
+    const commandName = args[0].toLowerCase();
+    const command = commands[commandName];
     if (command) {
         command(msg, args, client);
     }
@@ -52,4 +54,22 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
     }
 });
 
-client.login(token);
+const token_thunks = [
+	() => process.env["BOT_TOKEN"],
+	() => readFileSync("token.txt"),
+	() => require('./token'),
+];
+
+const get_token = function() {
+	for (const thunk of token_thunks) {
+		try {
+			const value = thunk();
+			if (value) {
+				return value.toString().trim();
+			}
+		} catch (e) {}
+	}
+	throw new Error("Could not find token! Searched in the following locations: $BOT_TOKEN, token.txt, token.js");
+}
+
+client.login(get_token());
