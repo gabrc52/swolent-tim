@@ -41,7 +41,7 @@ const logConfession = async (number, confession, confessor, msg, client, confess
  * @param {Discord.Client} client 
  */
 
-const sendConfession = async (msg, args, client, channelId, confessionType) => {
+const confessCommand = async (client, channel, confessionType, msg, args) => {
     let confession = msg.content.substr(args[0].length + 1).trim();
     /// Remove brackets
     if (confession[0] === '[' && confession[confession.length - 1] === ']') {
@@ -67,11 +67,9 @@ const sendConfession = async (msg, args, client, channelId, confessionType) => {
         return;
     }
     const confessor = msg.author.id;
-    const guild = client.guilds.cache.get(config.guild_2025);
-    const channel = guild.channels.resolve(channelId);
     const verificationStatus = verification.isVerified(confessor, client);
     verificationStatus.then(() => {
-        const fileName = `confession_counter_${channelId}`;
+        const fileName = `confession_counter_${channel.id}`;
         fs.readFile(fileName, 'utf8', (err, data) => {
             let number = 1 + (err ? 0 : +data);
             logConfession(number, confession, confessor, msg, client, confessionType);
@@ -86,15 +84,7 @@ const sendConfession = async (msg, args, client, channelId, confessionType) => {
     }).catch(error => msg.reply(`Can't confess: ${error}`));
 };
 
-const confessCommand = (msg, args, client) => {
-    sendConfession(msg, args, client, config.confessions_channel, 'Confession');
-}
-
-const boomerConfessCommand = (msg, args, client) => {
-    sendConfession(msg, args, client, config.boomer_confessions_channel, 'Confession w/boomers');
-}
-
-const deconfessCommand = (msg, args, _client) => {
+const deconfessCommand = (client, msg, args) => {
     const fragmentStrings = args.slice(1);
     const numMods = config.server_mods.length;
     const neededFragments = Math.ceil(numMods / 2);
@@ -106,8 +96,18 @@ const deconfessCommand = (msg, args, _client) => {
     }
 };
 
-module.exports = {
-    confessCommand,
-    boomerConfessCommand,
-    deconfessCommand,
-};
+const setup = (client, config) => [
+    {
+        name: 'confess',
+        unprefixed: true,
+        call: confessCommand.bind(null, client, client.channels.get(config.confessions_channel), 'Confession'),
+    }, {
+        name: 'boomerconfess',
+        unprefixed: true,
+        call: confessCommand.bind(null, client, client.channels.get(config.boomer_confessions_channel), 'Confession w/ boomers'),
+    }, {
+        name: 'deconfess',
+        call: deconfessCommand.bind(null, client),
+    }
+];
+module.exports = {setup};
