@@ -70,7 +70,7 @@ const confessCommand = async (client, channel, confessionType, msg, args) => {
     const confessor = msg.author.id;
     const verificationStatus = verification.checkVerified(confessor);
     verificationStatus.then(() => {
-        const fileName = `confession_counter_${channelId}`;
+        const fileName = `confession_counter_${channel.id}`;
         fs.readFile(fileName, 'utf8', (err, data) => {
             let number = 1 + (err ? 0 : +data);
             logConfession(number, confession, confessor, msg, client, confessionType);
