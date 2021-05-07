@@ -1,14 +1,30 @@
 const Discord = require('discord.js');
 const config = require('./config');
-const commands = require('./commands');
-const starboard = require('./starboard');
 const verification = require('./verification');
 const breakout = require('./breakout');
+const {readFileSync} = require('fs');
 
 /// From https://discordjs.guide/popular-topics/reactions.html#awaiting-reactions
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
+const commands = {};
+const prefix = 'tim.';
+
+const modules = ['commands', 'confessions', 'starboard'];
 
 client.on('ready', () => {
+    for (const module of modules) {
+        const cmds = require('./' + module).setup(client, config);
+        if (!cmds) {
+            continue;
+        }
+        for (const cmd of cmds) {
+            const name = cmd.name.toLowerCase();
+            if (cmd.unprefixed) {
+                commands[name] = cmd.call;
+            }
+            commands[prefix + name] = cmd.call;
+        }
+    }
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
@@ -24,8 +40,6 @@ client.on('message', msg => {
 client.on('guildMemberAdd', guildMember => {
     verification.verify(guildMember, client);
 });
-
-client.on('messageReactionAdd', starboard.checkReactionForStarboard);
 
 client.on('guildMemberUpdate', (oldMember, newMember) => {
     const guild = client.guilds.cache.get(config.guild_2025);
@@ -55,7 +69,7 @@ const get_token = function() {
 		try {
 			const value = thunk();
 			if (value) {
-				return value.trim();
+				return value.toString().trim();
 			}
 		} catch (e) {}
 	}
