@@ -14,8 +14,8 @@ const encryptWithPublicKey = (fragment, publicKey) => {
     return encrypted.toString('base64');
 }
 
-const logConfession = async (number, confession, confessor, msg, client) => {
-    const secretStr = `Confession #${number} by ${confessor}: ${confession}`;
+const logConfession = async (number, confession, confessor, msg, client, confessionType) => {
+    const secretStr = `${confessionType} #${number} by ${confessor}`;
     const secret = Buffer.from(secretStr);
     const mods = Object.keys(config.server_mods);
     const publicKeys = Object.values(config.server_mods);
@@ -26,7 +26,8 @@ const logConfession = async (number, confession, confessor, msg, client) => {
         const encryptedFragment = encryptWithPublicKey(fragment, publicKeys[i]);
         try {
             const user = await client.users.fetch(mods[i]);
-            user.send(`**Confession #${number}**:\n${encryptedFragment}`);
+            user.send(`**${confessionType} #${number}**: ${encryptedFragment}`);
+            user.send(`${confession}`);
         } catch (e) {
             msg.reply(e);
         }
@@ -40,7 +41,7 @@ const logConfession = async (number, confession, confessor, msg, client) => {
  * @param {Discord.Client} client 
  */
 
-const confessCommand = async (client, msg, args) => {
+const confessCommand = async (client, channel, confessionType, msg, args) => {
     // TODO: Move this body into a class so we can persist some state
     let confession = msg.content.substr(args[0].length + 1).trim();
     /// Remove brackets
@@ -67,19 +68,19 @@ const confessCommand = async (client, msg, args) => {
         return;
     }
     const confessor = msg.author.id;
-    const guild = client.guilds.cache.get(config.guild_2025);
-    const channel = guild.channels.resolve(config.confessions_channel);
     const verificationStatus = verification.checkVerified(confessor);
     verificationStatus.then(() => {
-        fs.readFile('confession_counter', 'utf8', (err, data) => {
+        const fileName = `confession_counter_${channelId}`;
+        fs.readFile(fileName, 'utf8', (err, data) => {
             let number = 1 + (err ? 0 : +data);
-            logConfession(number, confession, confessor, msg, client);
-            fs.writeFileSync('confession_counter', number.toString());
-            const embed = new Discord.MessageEmbed()
-                .setAuthor(`Confession #${number}`)
-                .setColor(config.embed_color)
-                .setDescription(confession);
-            channel.send(embed);
+            logConfession(number, confession, confessor, msg, client, confessionType);
+            fs.writeFileSync(fileName, number.toString());
+            // const confessionMsg = new Discord.MessageEmbed()
+            //     .setAuthor(`${confessionType} #${number}`)
+            //     .setColor(config.embed_color)
+            //     .setDescription(confession);
+            const confessionMsg = `**#${number}**: ${confession}`;
+            channel.send(confessionMsg);
         });
     }).catch(error => msg.reply(`Can't confess: ${error}`));
 };
@@ -100,7 +101,11 @@ const setup = (client, config) => [
     {
         name: 'confess',
         unprefixed: true,
-        call: confessCommand.bind(null, client),
+        call: confessCommand.bind(null, client, client.channels.get(config.confessions_channel), 'Confession'),
+    }, {
+        name: 'boomerconfess',
+        unprefixed: true,
+        call: confessCommand.bind(null, client, client.channels.get(config.boomer_confessions_channel), 'Confession w/ boomers'),
     }, {
         name: 'deconfess',
         call: deconfessCommand.bind(null, client),

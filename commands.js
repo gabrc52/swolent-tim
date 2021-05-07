@@ -1,5 +1,6 @@
 const got = require('got');
 const breakout = require('./breakout');
+const { exec } = require("child_process");
 
 const setup = client => [
     {
@@ -10,17 +11,22 @@ const setup = client => [
     }, {
         name: 'taken',
         call: async (msg, args) => {
-            if (msg.content.trim() === 'tim.taken') {
+            if (!args[1]) {
                 msg.reply("Please specify a possible kerb to know if it's taken or not (for example: `tim.taken stress`).");
             } else {
-                const possibleUser = args[1];
-                /// https://www.twilio.com/blog/5-ways-to-make-http-requests-in-node-js-using-async-await
-                try {
-                    const response = await got(`https://rgabriel.scripts.mit.edu/taken.php?name=${possibleUser}`);
-                    msg.channel.send(`${response.body}`);
-                } catch (e) {
-                    console.error(`${e}`);
-                    msg.channel.send(`${e}`);
+                if (msg.channel.type === 'dm' || msg.channel.name.includes('bot')) {
+                    const possibleUser = args[1];
+                    /// https://www.twilio.com/blog/5-ways-to-make-http-requests-in-node-js-using-async-await
+                    try {
+                        const response = await got(`https://rgabriel.scripts.mit.edu/taken.php?name=${possibleUser}`);
+                        msg.channel.send(`${response.body}`);
+                    } catch (e) {
+                        console.error(`${e}`);
+                        msg.channel.send(`${e}`);
+                    }
+                } else {
+                    // TODO: Dehardcode this?
+                    msg.reply(`Please take kerb checking to <#788807776812924949> or <#783443258789330965>.`);
                 }
             }
         }
@@ -51,6 +57,18 @@ const setup = client => [
         call: async (msg, args) => {
             msg.reply('Ok, filling breakout rooms...');
             await breakout.fillBreakoutRooms(client);
+        }
+    }, {
+        name: 'revision',
+        call: msg => {
+            // TODO: Pull in a git lib or parse .git/HEAD by hand? Summoning ref by hand is dangerous
+            exec('git rev-parse HEAD', (error, stdout, stderr) => {
+                if (error) {
+                    msg.reply(`Error getting revision:\n${stderr}`);
+                } else {
+                    msg.reply(stdout.substr(0, 7));
+                }
+            });
         }
     }
 ];
