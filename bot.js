@@ -8,7 +8,7 @@ const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION']
 const commands = {};
 const prefix = 'tim.';
 
-const modules = ['commands', 'confessions', 'starboard'];
+const modules = ['commands', 'confessions', 'starboard', 'verification'];
 
 client.on('ready', () => {
     for (const module of modules) {
