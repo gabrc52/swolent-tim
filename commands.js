@@ -18,6 +18,7 @@ const setup = client => [
                     const possibleUser = args[1];
                     /// https://www.twilio.com/blog/5-ways-to-make-http-requests-in-node-js-using-async-await
                     try {
+                        // TODO: don't rely on a script/endpoint
                         const response = await got(`https://rgabriel.scripts.mit.edu/taken.php?name=${possibleUser}`);
                         msg.channel.send(`${response.body}`);
                     } catch (e) {
@@ -38,6 +39,7 @@ const setup = client => [
             } else {
                 const list = args[1];
                 try {
+                    // TODO: don't rely on a script/endpoint
                     const response = await got(`https://rgabriel.scripts.mit.edu/listinfo.php?name=${list}`);
                     msg.channel.send(`${response.body}`);
                 } catch (e) {
