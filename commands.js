@@ -17,12 +17,28 @@ const setup = client => [
                 if (msg.channel.type === 'dm' || msg.channel.name.includes('bot')) {
                     const possibleUser = args[1];
                     /// https://www.twilio.com/blog/5-ways-to-make-http-requests-in-node-js-using-async-await
+                    let response = null;
                     try {
-                        const response = await got(`https://rgabriel.scripts.mit.edu/taken.php?name=${possibleUser}`);
-                        msg.channel.send(`${response.body}`);
+                        response = JSON.parse(await got(`https://rgabriel.scripts.mit.edu/taken.php?name=${possibleUser}`));
                     } catch (e) {
                         console.error(`${e}`);
-                        msg.channel.send(`${e}`);
+                        msg.channel.send(`Got a bad response from the server! Could scripts.mit.edu be down?`);
+                        return;
+                    }
+                    if (response.available) {
+                        let message = `:green_check_mark: ${possibleUser} is available!`;
+                        if (response.errors.length) {
+                            message += ` However, ${response.errors[0].message}. You can still make a mailing list with that name.`;
+                        }
+                        msg.channel.send(message);
+                    } else {
+                        let message = ':x: ';
+                        if (response.errors.length) {
+                            message += response.errors[0].message;
+                        } else {
+                            message += 'An unknown error occurred.'
+                        }
+                        msg.channel.send(message);
                     }
                 } else {
                     // TODO: Dehardcode this?

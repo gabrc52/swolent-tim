@@ -1,34 +1,60 @@
 <?php
 
-$name = $_GET["name"];
-
-if (!is_string($name)) {
-	die("Please enter a string >:(");
+/* Datamodel:
+ * {"available": <whether the input is available>, "errors": [<errors> ...]
+ * where each error has the form {"code": "STRING_CODE", "message": "default message for the error"}.
+ */
+function finish($available, $errors) {
+	return json_encode(array(
+		"available" => $available,
+		"errors" => $errors,
+	));
 }
 
-/// The following line removes all characters not letters or numbers, to avoid a shell injection vulnerability
-/// Taken from https://stackoverflow.com/questions/5199133/function-to-return-only-alpha-numeric-characters-from-string
-$name = preg_replace("/[^a-zA-Z0-9\-_.]+/", "", $name);
+function error($code, $message) {
+	return array("code" => $code, "message" => $message);
+}
+function fail($code, $message) {
+	return finish(false, array(error($code, $message)));
+}
 
-/// Emails are case insensitive but the queries aren't; everything is stored in lowercase
-$name = strtolower($name);
-
-$mailingListTaken = !exec("qy glin ".$name." 2>&1 | grep \"No records in database match query\"");
-$kerbTaken = !exec("qy gubl ".$name." 2>&1 | grep \"No records in database match query\"");
-
-if ($mailingListTaken) {
-	echo ":x: ".$name." is taken as a mailing list";
-} else if ($kerbTaken) {
-	echo ":x: ".$name." is taken as a kerb";
-} else {
-	echo ":white_check_mark: ".$name." is available!";
-	if (strlen($name) < 3) {
-		echo " However, it is too short for a kerb. You can still create a mailing list with that name.";
-	} else if (strlen($name) > 8) {
-		echo " However, it is too long for a kerb. You can still create a mailing list with that name.";
-	} else if (!ctype_lower($name)) {
-		echo " It is strongly recommended to only use lowercase letters in your kerb.";
+function parse($name) {
+	if (!is_string($name)) {
+		return fail("BAD_INPUT_TYPE", "`name` field missing from input.");
 	}
+	if (empty($name)) {
+		return fail("EMPTY_INPUT", "Missing input string! Please provide a string to check whether it's available.");
+	}
+	$name = strtolower($name);
+	if (!preg_match("/^[a-z0-9_.-]+$/", $name)) {
+		return fail("BAD_INPUT_CHARS", "Input has invalid chars for a kerb or mailing list! Must be composed of: letters, numbers, dashes, dots, underscores.");
+	}
+
+	// TODO: Look into a less porcelain API?
+	$mailingListTaken = !exec("qy glin {$name} 2>&1 | grep \"No records in database match query\"");
+	if ($mailingListTaken) {
+		return fail("EXISTING_LIST", "{$name} is already taken as a mailing list.");
+	}
+	$kerbTaken = !exec("qy gubl {$name} 2>&1 | grep \"No records in database match query\"");
+	if ($kerbTaken) {
+		return fail("EXISTING_KERB", "{$name} is already taken as a kerb.");
+	}
+
+	$warnings = array();
+	if (!preg_match("/^[a-z0-9_]+$/", $name)) {
+		$warnings[] = error("BAD_KERB_CHARS", "kerbs must be composed of letters, numbers, and underscores");
+	}
+	if (strlen($name) < 3) {
+		$warnings[] = error("KERB_TOO_SHORT", "kerbs must be at least 3 characters long");
+	}
+	if (strlen($name) > 8) {
+		$warnings[] = error("KERB_TOO_LONG", "kerbs must be at most 8 characters long");
+	}
+	
+	return finish(true, $warnings);
 }
+
+header('Content-Type: application/json');
+echo parse($_GET["name"]);
 
 ?>
