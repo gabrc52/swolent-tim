@@ -36,6 +36,7 @@ client.on('message', msg => {
     }
 });
 
+// TODO: move this into new module system
 client.on('guildMemberUpdate', (oldMember, newMember) => {
     const guild = client.guilds.cache.get(config.guild_2025);
 
