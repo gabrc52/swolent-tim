@@ -12,10 +12,11 @@ class Verifier {
     }
 
     /**
+     * Check if a Discord user has been verified as an adMIT by Swole Tim
      * Resolve with a nullary value, or reject with an error message.
      * @param {string} id the id of the person to check
      */
-    async checkVerified(id) {
+    async isAdmit(id) {
         const guildMember = this.base_guild.members.cache.get(id);
         if (!guildMember) {
             throw "You're not in the MIT 2025 server."
@@ -38,6 +39,8 @@ class Verifier {
         return cached;
     }
 
+    // TODO: move this to checking for comMIT instead of adMIT
+
     verify(guildMember) {
         const guild = guildMember.guild;
         const {channel, role} = this.get_cached(guild);
@@ -45,7 +48,7 @@ class Verifier {
         if (!channel) {
             return;
         }
-        const verification = this.checkVerified(guildMember.id);
+        const verification = this.isAdmit(guildMember.id);
         verification.then(() => {
             if (role) {
                 guildMember.roles.add(role);
@@ -80,7 +83,7 @@ const genCommands = verifier => [
             } else {
                 const username = args[1];
                 const url = `https://rgabriel.scripts.mit.edu/mc/prefrosh.php?name=${username}&discord=${msg.author.id}`;
-                const verificationStatus = verifier.checkVerified(msg.author.id);
+                const verificationStatus = verifier.isAdmit(msg.author.id);
                 verificationStatus
                     .then(() => got(url).then(response => msg.channel.send(`${response.body}`)))
                     .catch(error => msg.reply(`${error} If you're not a prefrosh, go to https://mitcraft.ml to get whitelisted. Go to #help if you're having trouble.`));
