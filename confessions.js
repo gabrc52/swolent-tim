@@ -68,7 +68,7 @@ const confessCommand = async (client, verifier, channel, confessionType, msg, ar
         return;
     }
     const confessor = msg.author.id;
-    const verificationStatus = verifier.checkVerified(confessor);
+    const verificationStatus = verifier.isAdmit(confessor);
     verificationStatus.then(() => {
         const fileName = `confession_counter_${channel.id}`;
         fs.readFile(fileName, 'utf8', (err, data) => {
