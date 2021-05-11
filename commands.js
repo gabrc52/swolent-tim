@@ -76,9 +76,9 @@ const setup = client => [
         name: 'update',
         call: msg => {
             /// TODO: do something more ~elegant~
-            exec('git pull', (error, stdout, stderr) => {
-                msg.reply(`${stdout}\n${stderr}`);
-                msg.reply('Restarting, please wait a minute...');
+            exec('git pull', async (error, stdout, stderr) => {
+                await msg.reply(`${stdout}\n${stderr}`);
+                await msg.reply('Restarting, please wait a minute...');
                 process.exit();
             });
         }
