@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const config = require('./config');
 const breakout = require('./breakout');
+const getVerifyLink = require('./verification').getVerifyLink;
 const {readFileSync} = require('fs');
 
 /// From https://discordjs.guide/popular-topics/reactions.html#awaiting-reactions
@@ -52,6 +53,14 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
             breakout.assignToRoom(newMember.user.id, guild);
         }
     }
+});
+
+client.on('guildMemberAdd', member => {
+    member.send(`Hi! I'm Tim. In order to get verified as a member of the class of 2025, please click on the following link:
+
+${getVerifyLink(member.id)}
+
+Once you're in the server, please check out #rules-n-how-to-discord, get roles in #roles, and don't forget to introduce yourself to your fellow adMITs in #introductions!`);
 });
 
 const token_thunks = [
