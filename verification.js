@@ -64,6 +64,10 @@ class Verifier {
 
 }
 
+const getVerifyLink = id => {
+    return `https://rgabriel.scripts.mit.edu:444/discord/verify.php?id=${id}&auth=${sha256(`${pepper}:${id}`)}`;
+}
+
 // I know singletons are discouraged,
 // but in this case we really do only need one verifier.
 // It's cleaner than passing around one per client, at any rate
@@ -75,7 +79,7 @@ const genCommands = (verifier, config) => [
         call: msg => {
             const id = msg.author.id;
             if (msg.channel.type === 'dm' || msg.guild.id == config.guild_2025) {
-                msg.author.send(`To verify that you're a comMIT please click on the following link: https://rgabriel.scripts.mit.edu:444/discord/verify.php?id=${id}&auth=${sha256(`${pepper}:${id}`)}`);
+                msg.author.send(`To verify that you're a comMIT please click on the following link: ${getVerifyLink(id)}`);
             } else {
                 const guildMember = msg.guild.members.cache.get(id);
                 verifier.verify(guildMember);
@@ -103,4 +107,5 @@ const setup = (client, config) => {
 module.exports = {
     setup,
     Verifier,
+    getVerifyLink,
 };
