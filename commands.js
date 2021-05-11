@@ -72,6 +72,16 @@ const setup = client => [
                 }
             });
         }
-    }
+    }, {
+        name: 'update',
+        call: msg => {
+            /// TODO: do something more ~elegant~
+            exec('git pull', (error, stdout, stderr) => {
+                msg.reply(`${stdout}\n${stderr}`);
+                msg.reply('Restarting, please wait a minute...');
+                process.exit();
+            });
+        }
+    },
 ];
 module.exports = {setup};
