@@ -74,10 +74,10 @@ const genCommands = (verifier, config) => [
         name: 'verify',
         call: msg => {
             const id = msg.author.id;
-            const guildMember = msg.guild.members.cache.get(id);
-            if (msg.guild.id == config.guild_2025 || msg.channel.type === 'dm') {
-                guildMember.send(`To verify that you're a comMIT please click on the following link: https://rgabriel.scripts.mit.edu:444/discord/verify.php?id=${id}&auth=${sha256(`${pepper}:${id}`)}`);
+            if (msg.channel.type === 'dm' || msg.guild.id == config.guild_2025) {
+                msg.author.send(`To verify that you're a comMIT please click on the following link: https://rgabriel.scripts.mit.edu:444/discord/verify.php?id=${id}&auth=${sha256(`${pepper}:${id}`)}`);
             } else {
+                const guildMember = msg.guild.members.cache.get(id);
                 verifier.verify(guildMember);
             }
         }
