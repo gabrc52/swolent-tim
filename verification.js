@@ -1,4 +1,6 @@
 const got = require('got');
+const pepper = require('./pepper');
+const sha256 = require('js-sha256').sha256;
 
 class Verifier {
     constructor(client, config) {
@@ -67,12 +69,17 @@ class Verifier {
 // It's cleaner than passing around one per client, at any rate
 let verifier = null;
 
-const genCommands = verifier => [
+const genCommands = (verifier, config) => [
     {
         name: 'verify',
         call: msg => {
-            const guildMember = msg.guild.members.cache.get(msg.author.id);
-            verifier.verify(guildMember);
+            const id = msg.author.id;
+            const guildMember = msg.guild.members.cache.get(id);
+            if (msg.guild.id == config.guild_2025 || msg.channel.type === 'dm') {
+                guildMember.send(`To verify that you're a comMIT please click on the following link: https://rgabriel.scripts.mit.edu:444/discord/verify.php?id=${id}&auth=${sha256(`${pepper}:${id}`)}`);
+            } else {
+                verifier.verify(guildMember);
+            }
         }
     }, {
         name: 'whitelist',
@@ -91,7 +98,7 @@ const setup = (client, config) => {
     client.on('guildMemberAdd', guildMember => verifier.verify(guildMember));
 
     // Commands
-    return genCommands(verifier);
+    return genCommands(verifier, config);
 };
 module.exports = {
     setup,

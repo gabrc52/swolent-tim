@@ -11,3 +11,6 @@ confession_counter_*
 
 # Role Assignment script (as it contains sensitive Discord IDs)
 role-assign.js
+
+# The pepper for verification
+pepper.js
