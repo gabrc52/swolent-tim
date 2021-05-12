@@ -73,13 +73,17 @@ const getVerifyLink = id => {
 // It's cleaner than passing around one per client, at any rate
 let verifier = null;
 
+const sendVerificationDm = user => {
+    user.send(`To verify that you're a comMIT please click on the following link: ${getVerifyLink(id)}`);
+};
+
 const genCommands = (verifier, config) => [
     {
         name: 'verify',
         call: msg => {
             const id = msg.author.id;
             if (msg.channel.type === 'dm' || msg.guild.id == config.guild_2025) {
-                msg.author.send(`To verify that you're a comMIT please click on the following link: ${getVerifyLink(id)}`);
+                sendVerificationDm(msg.author);
             } else {
                 const guildMember = msg.guild.members.cache.get(id);
                 verifier.verify(guildMember);
@@ -100,7 +104,11 @@ const setup = (client, config) => {
     }
     verifier = new Verifier(client, config);
     client.on('guildMemberAdd', guildMember => verifier.verify(guildMember));
-
+    client.on('messageReactionAdd', (reaction, user) => {
+        if (reaction.emoji.name === 'verifyme') {
+            sendVerificationDm(user);
+        }
+    });
     // Commands
     return genCommands(verifier, config);
 };
