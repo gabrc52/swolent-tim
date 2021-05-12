@@ -81,7 +81,6 @@ const genCommands = (verifier, config) => [
     {
         name: 'verify',
         call: msg => {
-            const id = msg.author.id;
             if (msg.channel.type === 'dm' || msg.guild.id == config.guild_2025) {
                 sendVerificationDm(msg.author);
             } else {
