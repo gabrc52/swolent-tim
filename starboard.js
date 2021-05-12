@@ -45,7 +45,7 @@ const starboardReact = async (config, channel, reaction, _user) => {
     if (reaction.count >= config.reaction_threshold) {
         switch (reaction.emoji.name) {
         case '⭐':
-            if (hasBeenStarboarded(reaction.message)) {
+            if (!hasBeenStarboarded(reaction.message)) {
                 console.log(`Starboarding ${reaction.message.id}`);
                 rememberStarboard(reaction.message);
                 addToStarboard(reaction.message, channel, config);
