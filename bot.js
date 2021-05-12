@@ -2,10 +2,13 @@ const Discord = require('discord.js');
 const config = require('./config');
 const breakout = require('./breakout');
 const getVerifyLink = require('./verification').getVerifyLink;
-const {readFileSync} = require('fs');
+const { readFileSync } = require('fs');
 
 /// From https://discordjs.guide/popular-topics/reactions.html#awaiting-reactions
-const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
+const client = new Discord.Client({
+    partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+    disableMentions: 'all',
+});
 const commands = {};
 const prefix = 'tim.';
 
@@ -64,21 +67,21 @@ Once you're in the server, please check out #rules-n-how-to-discord, get roles i
 });
 
 const token_thunks = [
-	() => process.env["BOT_TOKEN"],
-	() => readFileSync("token.txt"),
-	() => require('./token'),
+    () => process.env["BOT_TOKEN"],
+    () => readFileSync("token.txt"),
+    () => require('./token'),
 ];
 
-const get_token = function() {
-	for (const thunk of token_thunks) {
-		try {
-			const value = thunk();
-			if (value) {
-				return value.toString().trim();
-			}
-		} catch (e) {}
-	}
-	throw new Error("Could not find token! Searched in the following locations: $BOT_TOKEN, token.txt, token.js");
+const get_token = function () {
+    for (const thunk of token_thunks) {
+        try {
+            const value = thunk();
+            if (value) {
+                return value.toString().trim();
+            }
+        } catch (e) { }
+    }
+    throw new Error("Could not find token! Searched in the following locations: $BOT_TOKEN, token.txt, token.js");
 }
 
 client.login(get_token());
