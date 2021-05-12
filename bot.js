@@ -7,7 +7,7 @@ const { readFileSync } = require('fs');
 /// From https://discordjs.guide/popular-topics/reactions.html#awaiting-reactions
 const client = new Discord.Client({
     partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-    disableMentions: 'all',
+    disableMentions: 'everyone',
 });
 const commands = {};
 const prefix = 'tim.';
