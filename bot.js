@@ -47,7 +47,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
         if (wasGivenRole(config.verification.verified_role)) {
             const channel = guild.channels.cache.get(config.welcome_channel);
             const user = newMember.user;
-            channel.send(`${user}, welcome to MIT '25! Please head over to <#783439183888384031> to get tags for pronouns, regions, etc., and if you're new to Discord, <#789592290518892545> will explain how to use this platform! Then you can introduce yourself in <#786487633928650813>. Congratulations again! <:bbydab:784988174647558145> :confetti_ball:\n\nP.S. We have some special guests here (current students and folks from the admissions office)! Say hi in <#783818929961173002> or in this channel :smile: (the server is still ours tho, they can only access the Boomer chats, not all other chats for their own safety)!!`);
+            channel.send(`${user}, welcome to MIT '25! Please head over to <#783439183888384031> to get tags for pronouns, regions, etc., and if you're new to Discord, <#789592290518892545> will explain how to use this platform! Then you can introduce yourself in <#783438962756288529>. Congratulations again! <:bbydab:784988174647558145> :confetti_ball:\n\nP.S. We have some special guests here (current students and folks from the admissions office)! Say hi in <#783818929961173002> or in this channel :smile: (the server is still ours tho, they can only access the Boomer chats, not all other chats for their own safety)!!`);
         }
         if (wasGivenRole(config.breakout_unassigned_role) && !oldMember.roles.cache.get(config.breakout_assigned_role)) {
             breakout.assignToRoom(newMember.user.id, guild);
