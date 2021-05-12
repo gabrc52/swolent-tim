@@ -74,7 +74,7 @@ const getVerifyLink = id => {
 let verifier = null;
 
 const sendVerificationDm = user => {
-    user.send(`To verify that you're a comMIT please click on the following link: ${getVerifyLink(id)}`);
+    user.send(`To verify that you're a comMIT please click on the following link: ${getVerifyLink(user.id)}`);
 };
 
 const genCommands = (verifier, config) => [
