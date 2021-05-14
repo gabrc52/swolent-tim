@@ -1,4 +1,5 @@
 const got = require('got');
+const pepper = require('./pepper');
 const breakout = require('./breakout');
 const { exec } = require("child_process");
 
@@ -19,7 +20,7 @@ const setup = client => [
                     /// https://www.twilio.com/blog/5-ways-to-make-http-requests-in-node-js-using-async-await
                     try {
                         // TODO: don't rely on a script/endpoint
-                        const response = await got(`https://rgabriel.scripts.mit.edu/taken.php?name=${possibleUser}`);
+                        const response = await got(`https://rgabriel.scripts.mit.edu/taken.php?name=${possibleUser}&auth=${pepper}`);
                         msg.channel.send(`${response.body}`);
                     } catch (e) {
                         console.error(`${e}`);
@@ -40,7 +41,7 @@ const setup = client => [
                 const list = args[1];
                 try {
                     // TODO: don't rely on a script/endpoint
-                    const response = await got(`https://rgabriel.scripts.mit.edu/listinfo.php?name=${list}`);
+                    const response = await got(`https://rgabriel.scripts.mit.edu/listinfo.php?name=${list}&auth=${pepper}`);
                     msg.channel.send(`${response.body}`);
                 } catch (e) {
                     console.error(e);
