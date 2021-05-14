@@ -1,6 +1,11 @@
 <?php
+require 'constants.php';
 
 header('Content-Type: text/plain');
+
+if ($_GET['auth'] !== PEPPER) {
+	die("Not authenticated!");
+}
 
 $name = $_GET["name"];
 
