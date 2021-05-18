@@ -83,11 +83,6 @@ const setup = client => [
                 process.exit();
             });
         }
-    }, {
-        name: 'meow',
-        call: msg => {
-            msg.channel.send('meow');
-        }
     },
 ];
 module.exports = {setup};
