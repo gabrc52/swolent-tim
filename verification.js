@@ -65,7 +65,7 @@ class Verifier {
 }
 
 const getVerifyLink = id => {
-    return `https://rgabriel.scripts.mit.edu:444/discord/verify.php?id=${id}&auth=${sha256(`${pepper}:${id}`)}`;
+    return `https://discord2025.scripts.mit.edu:444/verify.php?id=${id}&auth=${sha256(`${pepper}:${id}`)}`;
 }
 
 // I know singletons are discouraged,
