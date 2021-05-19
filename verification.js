@@ -14,11 +14,11 @@ class Verifier {
     }
 
     /**
-     * Check if a Discord user has been verified as an adMIT by Swole Tim
+     * Check if a Discord user has been verified as an comMIT by Swole Tim
      * Resolve with a nullary value, or reject with an error message.
      * @param {string} id the id of the person to check
      */
-    async isAdmit(id) {
+    async isCommit(id) {
         const guildMember = this.base_guild.members.cache.get(id);
         if (!guildMember) {
             throw "You're not in the MIT 2025 server."
@@ -50,7 +50,7 @@ class Verifier {
         if (!channel) {
             return;
         }
-        const verification = this.isAdmit(guildMember.id);
+        const verification = this.isCommit(guildMember.id);
         verification.then(() => {
             if (role) {
                 guildMember.roles.add(role);
