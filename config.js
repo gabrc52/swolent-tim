@@ -14,7 +14,7 @@ module.exports = {
         // Channel to assign to verified people in a given server
         target_role: 'verified',
         // MIT 2025 verified role
-        verified_role: '841458449014587422',
+        verified_role: '789507257124913192',
     },
     confessions_channel: '819127555911188541',
     boomer_confessions_channel: '836071068175171606',
