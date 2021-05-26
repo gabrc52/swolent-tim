@@ -104,9 +104,7 @@ const setup = (client, config) => {
     }
     verifier = new Verifier(client, config);
     client.on('guildMemberAdd', guildMember => {
-        if (guildMember.guild.id == config.guild_2025) {
-            verifier.verify(guildMember);
-        }
+        verifier.verify(guildMember);
     });
     client.on('messageReactionAdd', (reaction, user) => {
         if (reaction.emoji.name === 'verifyme') {
