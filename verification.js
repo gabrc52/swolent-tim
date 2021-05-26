@@ -45,7 +45,7 @@ class Verifier {
 
     verify(guildMember) {
         const guild = guildMember.guild;
-        const {channel, role} = this.get_cached(guild);
+        const { channel, role } = this.get_cached(guild);
         /// Don't try to verify if #landing-pad doesn't exist
         if (!channel) {
             return;
@@ -103,7 +103,11 @@ const setup = (client, config) => {
         throw new Error("Verifier already setup!");
     }
     verifier = new Verifier(client, config);
-    client.on('guildMemberAdd', guildMember => verifier.verify(guildMember));
+    client.on('guildMemberAdd', guildMember => {
+        if (guildMember.guild == config.guild_2025) {
+            verifier.verify(guildMember);
+        }
+    });
     client.on('messageReactionAdd', (reaction, user) => {
         if (reaction.emoji.name === 'verifyme') {
             sendVerificationDm(user);
