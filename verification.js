@@ -104,7 +104,7 @@ const setup = (client, config) => {
     }
     verifier = new Verifier(client, config);
     client.on('guildMemberAdd', guildMember => {
-        if (guildMember.guild == config.guild_2025) {
+        if (guildMember.guild.id == config.guild_2025) {
             verifier.verify(guildMember);
         }
     });
