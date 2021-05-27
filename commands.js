@@ -12,6 +12,8 @@ const setup = client => [
     }, {
         name: 'taken',
         call: async (msg, args) => {
+            msg.reply("tim.taken is out of service for now, sorry...");
+            return;
             if (!args[1]) {
                 msg.reply("Please specify a possible kerb to know if it's taken or not (for example: `tim.taken stress`).");
             } else {
@@ -35,6 +37,8 @@ const setup = client => [
     }, {
         name: 'listinfo',
         call: async (msg, args) => {
+            msg.reply("tim.listinfo is out of service for now, sorry... You can use webmoira.mit.edu for now.");
+            return;
             if (msg.content.trim() === 'tim.listinfo') {
                 msg.reply("Please specify a mailing list to see its info (for example: `tim.listinfo plont`).");
             } else {
