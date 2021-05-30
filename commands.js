@@ -80,12 +80,16 @@ const setup = (client, config) => [
     }, {
         name: 'update',
         call: msg => {
-            /// TODO: do something more ~elegant~
-            exec('git pull', async (error, stdout, stderr) => {
-                await msg.reply(`${stdout}\n${stderr}`);
-                await msg.reply('Restarting, please wait a minute...');
-                process.exit();
-            });
+            if (Object.keys(config.server_mods).includes(msg.author.id)) {
+                /// TODO: do something more ~elegant~
+                exec('git pull', async (error, stdout, stderr) => {
+                    await msg.reply(`${stdout}\n${stderr}`);
+                    await msg.reply('Restarting, please wait a minute...');
+                    process.exit();
+                });
+            } else {
+                msg.reply('You do not have permission to run this command.');
+            }
         }
     }, {
         name: 'exec',
@@ -114,4 +118,4 @@ const setup = (client, config) => [
         }
     }
 ];
-module.exports = {setup};
+module.exports = { setup };
