@@ -3,7 +3,7 @@ const pepper = require('./pepper');
 const breakout = require('./breakout');
 const { exec } = require("child_process");
 
-const setup = client => [
+const setup = (client, config) => [
     {
         name: 'ping',
         call: msg => {
@@ -87,6 +87,31 @@ const setup = client => [
                 process.exit();
             });
         }
-    },
+    }, {
+        name: 'exec',
+        call: (msg, args) => {
+            if (msg.guild.id !== config.guild_2025) {
+                msg.reply('Wrong guild!');
+            } else if (Object.keys(config.server_mods).includes(msg.author.id)) {
+                const cmd = msg.content.substr(args[0].length + 1).trim();
+                exec(cmd, (error, stdout, stderr) => {
+                    let output = '';
+                    if (stdout.trim() != '') {
+                        output += 'Output:\n```\n';
+                        output += stdout;
+                        output += '\n```\n'
+                    }
+                    if (stderr.trim() != '') {
+                        output += 'Error:\n```\n';
+                        output += stderr;
+                        output += '\n```';
+                    }
+                    msg.channel.send(output);
+                });
+            } else {
+                msg.reply('You do not have permission to run this command.');
+            }
+        }
+    }
 ];
 module.exports = {setup};
