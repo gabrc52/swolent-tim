@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const fs = require('fs');
+const globalConfig = require('./config');
 
 // TODO: Migrate this to a persistent db data structure, rather than making the filesystem do it
 const rememberStarboard = msg => {
@@ -45,7 +46,7 @@ const starboardReact = async (config, channel, reaction, _user) => {
     if (reaction.count >= config.reaction_threshold) {
         switch (reaction.emoji.name) {
         case '⭐':
-            if (!hasBeenStarboarded(reaction.message) && reaction.message.guild.id == config.guild_2025) {
+            if (!hasBeenStarboarded(reaction.message) && reaction.message.guild.id == globalConfig.guild_2025) {
                 console.log(`Starboarding ${reaction.message.id}`);
                 rememberStarboard(reaction.message);
                 addToStarboard(reaction.message, channel, config);
