@@ -30,7 +30,7 @@ const logConfession = async (number, confession, confessAttachments, confessor, 
             if(confessAttachments.length > 0){
                 user.send({
                     content: `${confession}`,
-                    attachments: confessAttachments
+                    files: confessAttachments
                 });
             } else {
                 user.send(`${confession}`);
@@ -74,7 +74,7 @@ const confessCommand = async (client, verifier, channel, confessionType, msg, ar
     if (msg.webhookID) {
         return;
     }
-    let confessAttachments = Array.from(msg.attachments.values());
+    let confessAttachments = msg.attachments.array();
 
     const confessor = msg.author.id;
     const verificationStatus = verifier.isCommit(confessor);
@@ -92,7 +92,7 @@ const confessCommand = async (client, verifier, channel, confessionType, msg, ar
             if (confessAttachments.length > 0){
                 channel.send({
                     content: confessionMsg,
-                    attachments: confessAttachments
+                    files: confessAttachments
                 });
             } else {
                 channel.send(confessionMsg);
