@@ -14,7 +14,7 @@ const encryptWithPublicKey = (fragment, publicKey) => {
     return encrypted.toString('base64');
 }
 
-const logConfession = async (number, confession, confessor, msg, client, confessionType) => {
+const logConfession = async (number, confession, confessAttachments, confessor, msg, client, confessionType) => {
     const secretStr = `${confessionType} #${number} by ${confessor}`;
     const secret = Buffer.from(secretStr);
     const mods = Object.keys(config.server_mods);
@@ -27,7 +27,14 @@ const logConfession = async (number, confession, confessor, msg, client, confess
         try {
             const user = await client.users.fetch(mods[i]);
             user.send(`**${confessionType} #${number}**: ${encryptedFragment}`);
-            user.send(`${confession}`);
+            if(confessAttachments.length > 0){
+                user.send({
+                    content: `${confession}`,
+                    files: confessAttachments
+                });
+            } else {
+                user.send(`${confession}`);
+            }
         } catch (e) {
             msg.reply(e);
         }
@@ -67,20 +74,29 @@ const confessCommand = async (client, verifier, channel, confessionType, msg, ar
     if (msg.webhookID) {
         return;
     }
+    let confessAttachments = msg.attachments.array();
+
     const confessor = msg.author.id;
     const verificationStatus = verifier.isCommit(confessor);
     verificationStatus.then(() => {
         const fileName = `confession_counter_${channel.id}`;
         fs.readFile(fileName, 'utf8', (err, data) => {
             let number = 1 + (err ? 0 : +data);
-            logConfession(number, confession, confessor, msg, client, confessionType);
+            logConfession(number, confession, confessAttachments, confessor, msg, client, confessionType);
             fs.writeFileSync(fileName, number.toString());
             // const confessionMsg = new Discord.MessageEmbed()
             //     .setAuthor(`${confessionType} #${number}`)
             //     .setColor(config.embed_color)
             //     .setDescription(confession);
             const confessionMsg = `**#${number}**: ${confession}`;
-            channel.send(confessionMsg);
+            if (confessAttachments.length > 0){
+                channel.send({
+                    content: confessionMsg,
+                    files: confessAttachments
+                });
+            } else {
+                channel.send(confessionMsg);
+            }
         });
     }).catch(error => msg.reply(`Can't confess: ${error}`));
 };
