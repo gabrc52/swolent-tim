@@ -93,7 +93,13 @@ const genCommands = (verifier, config) => [
         name: 'whitelist',
         unprefixed: true,
         call: (msg, args) => {
-            msg.reply("2025s now have kerbs. Go to https://mitcraft.ml to get whitelisted. Go to #help if you're having trouble or anything else.");
+            if (!args[1]) {
+                msg.reply("Please specify a username after `whitelist` to get whitelisted");
+            } else {
+                const username = args[1];
+                const url = `https://rgabriel.scripts.mit.edu/mc/prefrosh.php?name=${username}&discord=${msg.author.id}`;
+                got(url).then(response => msg.channel.send(`${response.body}`));
+            }
         }
     }
 ];
