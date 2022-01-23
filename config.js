@@ -8,6 +8,7 @@ module.exports = {
         ],
     },
     guild_2025: '783435629186252820',
+    guild_2026: '910627532322267166',
     verification: {
         // Channel to call people out as unverified in
         target_channel: 'landing-pad',
@@ -16,6 +17,7 @@ module.exports = {
         // MIT 2025 verified role
         admitted_role: '789507257124913192',
         verified_role: '841458449014587422',
+        admitted_role_2026: '918241449412280371'
     },
     confessions_channel: '819127555911188541',
     boomer_confessions_channel: '836071068175171606',
