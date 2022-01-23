@@ -5,6 +5,7 @@ const sha256 = require('js-sha256').sha256;
 class Verifier {
     constructor(client, config) {
         this.base_guild = client.guilds.cache.get(config.guild_2025);
+        this.guild_2026 = client.guilds.cache.get(config.guild_2026);
         this.config = config.verification;
         this.verify_cache = {};
 
@@ -26,6 +27,23 @@ class Verifier {
             const role = guildMember.roles.cache.get(this.config.verified_role);
             if (!role) {
                 throw "Swole Tim hasn't verified you in the MIT 2025 server. Please follow the instructions to verify there."
+            }
+        }
+    }
+
+    // TODO: Essentially copy-paste function. Maybe make it not reuse code so much?
+    /**
+     * Check if Discord user is verified as admitted to the member of the class of 2026.
+     * @param {string} id the id of the person to check 
+     */
+    async is2026Admit(id) {
+        const guildMember = this.guild_2026.members.cache.get(id);
+        if (!guildMember) {
+            throw "You're not in the MIT 2026 server."
+        } else {
+            const role = guildMember.roles.cache.get(this.config.admitted_role_2026);
+            if (!role) {
+                throw "Swole Tim hasn't verified you in the MIT 2026 server. Please follow the instructions to verify there."
             }
         }
     }
@@ -61,7 +79,6 @@ class Verifier {
             channel.send(`${guildMember}: ${error}`);
         });
     }
-
 }
 
 const getVerifyLink = id => {
@@ -98,7 +115,10 @@ const genCommands = (verifier, config) => [
             } else {
                 const username = args[1];
                 const url = `https://rgabriel.scripts.mit.edu/mc/prefrosh.php?name=${username}&discord=${msg.author.id}`;
-                got(url).then(response => msg.channel.send(`${response.body}`));
+                const verificationStatus = verifier.is2026Admit(msg.author.id);
+                verificationStatus
+                    .then(() => got(url).then(response => msg.channel.send(`${response.body}`)))
+                    .catch(error => msg.reply(`${error} If you're not a prefrosh, go to https://mitcraft.ml to get whitelisted. Go to #help if you're having trouble.`));
             }
         }
     }
