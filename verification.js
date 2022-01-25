@@ -114,7 +114,7 @@ const genCommands = (verifier, config) => [
                 msg.reply("Please specify a username after `whitelist` to get whitelisted");
             } else {
                 const username = args[1];
-                const url = `https://rgabriel.scripts.mit.edu/mc/prefrosh.php?name=${username}&discord=${msg.author.id}`;
+                const url = `https://rgabriel.scripts.mit.edu/mc/prefrosh.php?name=${username}&discord=${msg.author.id}&auth=${pepper}`;
                 const verificationStatus = verifier.is2026Admit(msg.author.id);
                 verificationStatus
                     .then(() => got(url).then(response => msg.channel.send(`${response.body}`)))
