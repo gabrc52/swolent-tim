@@ -114,11 +114,16 @@ const genCommands = (verifier, config) => [
                 msg.reply("Please specify a username after `whitelist` to get whitelisted");
             } else {
                 const username = args[1];
-                const url = `https://rgabriel.scripts.mit.edu/mc/prefrosh.php?name=${username}&discord=${msg.author.id}&auth=${pepper}`;
-                const verificationStatus = verifier.is2026Admit(msg.author.id);
-                verificationStatus
+                const id = msg.author.id;
+                const url = `https://rgabriel.scripts.mit.edu/mc/prefrosh.php?name=${username}&discord=${id}&auth=${pepper}`;
+                const verificationStatus = verifier.is2026Admit(id);
+                if (id == '512635023539830794') {
+                    msg.reply('Almost done! To finish verifying, go to the following link: https://mitcraft.ml/prefrosh');
+                } else {
+                    verificationStatus
                     .then(() => got(url).then(response => msg.channel.send(`${response.body}`)))
                     .catch(error => msg.reply(`${error} If you're not a prefrosh, go to https://mitcraft.ml to get whitelisted. Go to #help if you're having trouble.`));
+                }
             }
         }
     }
