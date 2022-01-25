@@ -117,7 +117,7 @@ const genCommands = (verifier, config) => [
                 const id = msg.author.id;
                 const url = `https://rgabriel.scripts.mit.edu/mc/prefrosh.php?name=${username}&discord=${id}&auth=${pepper}`;
                 const verificationStatus = verifier.is2026Admit(id);
-                if (id == '512635023539830794') {
+                if (id == '600463130174423053') {
                     msg.reply('Almost done! To finish verifying, go to the following link: https://mitcraft.ml/prefrosh');
                 } else {
                     verificationStatus
