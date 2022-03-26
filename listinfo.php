@@ -20,6 +20,8 @@ $name = preg_replace("/[^a-zA-Z0-9\-_.]+/", "", $name);
 /// Emails are case insensitive but the queries aren't; everything is stored in lowercase
 $name = strtolower($name);
 
+die("To check list info go to https://groups.mit.edu/webmoira/list/".$name.", or if it doesn't work, it is a mailman list so try https://mailman.mit.edu/mailman/listinfo/".$name);
+
 $output = [];
 exec("./listinfo.py ".$name, $output);
 
