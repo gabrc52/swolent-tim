@@ -1,7 +1,7 @@
 <?php
 require 'constants.php';
 
-die("This command is out of service until further notice. If you want me to fix it, lmk.");
+die("This command is out of service until further notice. If you want me to fix it, lmk (gabrielr#9134).");
 
 if ($_GET['auth'] !== PEPPER) {
 	die("Not authenticated!");
