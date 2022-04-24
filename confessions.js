@@ -121,11 +121,11 @@ const genCommands = (client, config, verifier) => [
     {
         name: 'confess',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier.isCommit, client.channels.resolve(config.confessions_channel), 'Confession'),
+        call: confessCommand.bind(null, client, verifier.isCommit.bind(verifier), client.channels.resolve(config.confessions_channel), 'Confession'),
     }, {
         name: 'boomerconfess',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier.isCommit, client.channels.resolve(config.boomer_confessions_channel), 'Confession w/ boomers'),
+        call: confessCommand.bind(null, client, verifier.isCommit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel), 'Confession w/ boomers'),
     }, {
         name: 'deconfess',
         call: deconfessCommand.bind(null, client),
