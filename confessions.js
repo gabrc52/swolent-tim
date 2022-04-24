@@ -16,10 +16,10 @@ const encryptWithPublicKey = (fragment, publicKey) => {
 
 /// TODO: 2026 confessions should be logged separately
 
-const logConfession = async (number, confession, confessAttachments, confessor, msg, client, confessionType, mods) => {
+const logConfession = async (number, confession, confessAttachments, confessor, msg, client, confessionType, modsDict) => {
     const secretStr = `${confessionType} #${number} by ${confessor}`;
     const secret = Buffer.from(secretStr);
-    const mods = Object.keys(mods);
+    const mods = Object.keys(modsDict);
     const publicKeys = Object.values(mods);
     const numMods = mods.length;
     const shares = sss.split(secret, { shares: numMods, threshold: Math.floor(numMods / 2) + 1 });
