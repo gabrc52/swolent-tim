@@ -50,7 +50,7 @@ const logConfession = async (number, confession, confessAttachments, confessor, 
  * @param {Discord.Client} client 
  */
 
-const confessCommand = async (client, verificationChecker, channel, confessionType, msg, args) => {
+const confessCommand = async (client, verificationChecker, channel, confessionType, modsDict, msg, args) => {
     // TODO: Move this body into a class so we can persist some state
     let confession = msg.content.substr(args[0].length + 1).trim();
     /// Remove brackets
@@ -85,7 +85,7 @@ const confessCommand = async (client, verificationChecker, channel, confessionTy
         const fileName = `confession_counter_${channel.id}`;
         fs.readFile(fileName, 'utf8', (err, data) => {
             let number = 1 + (err ? 0 : +data);
-            logConfession(number, confession, confessAttachments, confessor, msg, client, confessionType, config.server_mods);
+            logConfession(number, confession, confessAttachments, confessor, msg, client, confessionType, modsDict);
             fs.writeFileSync(fileName, number.toString());
             // const confessionMsg = new Discord.MessageEmbed()
             //     .setAuthor(`${confessionType} #${number}`)
@@ -124,7 +124,7 @@ const confessCommandDisambiguator = async (client, verifier, msg, args) => {
         const is2025 = values[0].status === 'fulfilled';
         const is2026 = values[1].status === 'fulfilled';
         if (is2025) {
-            confessCommand(client, verifier.isCommit.bind(verifier), client.channels.resolve(config.confessions_channel), 'Confession', msg, args);
+            confessCommand(client, verifier.isCommit.bind(verifier), client.channels.resolve(config.confessions_channel), 'Confession', config.server_mods, msg, args);
         } else if (is2026) {
             msg.reply("This command is unavailable per 2026 mods request. Only `boomerconfess` is available");
         } else {
@@ -140,9 +140,9 @@ const boomerconfessCommandDisambiguator = async (client, verifier, msg, args) =>
         if (is2025 && is2026 && args[0] == 'boomerconfess') {
             msg.reply("You are both a '25 and '26 so please use `boomerconfess25` or `boomerconfess26` to specify where to confess.");
         } else if (is2025 || args[0] == 'boomerconfess25') {
-            confessCommand(client, verifier.isCommit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel), 'Confession w/ boomers', msg, args);
+            confessCommand(client, verifier.isCommit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel), 'Confession w/ boomers', config.server_mods, msg, args);
         } else if (is2026 || args[0] == 'boomerconfess26') {
-            confessCommand(client, verifier.is2026Admit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel_2026), msg, args);
+            confessCommand(client, verifier.is2026Admit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel_2026), config.server_mods_2026, msg, args);
         } else {
             msg.reply("This command is only available for people in the MIT 2025 or MIT 2026 servers. If you are, please verify. If it still doesn't work, let mods know");
         }
@@ -177,11 +177,11 @@ const genCommands = (client, config, verifier) => [
     {
         name: 'confess25',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier.isCommit.bind(verifier), client.channels.resolve(config.confessions_channel), 'Confession'),
+        call: confessCommand.bind(null, client, verifier.isCommit.bind(verifier), client.channels.resolve(config.confessions_channel), 'Confession', config.server_mods),
     }, {
         name: 'boomerconfess25',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier.isCommit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel), 'Confession w/ boomers'),
+        call: confessCommand.bind(null, client, verifier.isCommit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel), 'Confession w/ boomers', config.server_mods),
     }, {
         name: 'confess26',
         unprefixed: true,
@@ -191,7 +191,7 @@ const genCommands = (client, config, verifier) => [
     }, {
         name: 'boomerconfess26',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier.is2026Admit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel_2026), 'Confession w/ boomers'),
+        call: confessCommand.bind(null, client, verifier.is2026Admit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel_2026), 'Confession w/ boomers', config.server_mods_2026),
     }, {
         name: 'deconfess',
         call: deconfessCommand.bind(null, client),
