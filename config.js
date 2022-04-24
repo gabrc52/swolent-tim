@@ -21,6 +21,7 @@ module.exports = {
     },
     confessions_channel: '819127555911188541',
     boomer_confessions_channel: '836071068175171606',
+    boomer_confessions_channel_2026: '967856190585471086',
     welcome_channel: '820830137674760202',
     breakout_unassigned_role: '820052377306529874',
     breakout_assigned_role: '820817118097571850',
@@ -35,4 +36,18 @@ module.exports = {
         '492835919317958657': '-----BEGIN RSA PUBLIC KEY-----\nMIICCgKCAgEAxT5hNc/jLKsKjtbSM/mK4DmrY+SG1iTK7sLsGX9ys6Fy52AIv6fF\nQ9FYyu6wYnmJpiFMrKiHHoxH2mGPnzo5/3cJ0XOjncLjI6vRMLfM2YhLzRiE8nzS\nGrNaUVKAkh6sOvkdDYuFnCQTcOk9qC8RRucXCyl9A6/pv1Fw/wL4Soz/DRFq32KX\nenzMlIn3j05pnNCzuZPDbj5Sbi6pRndWMhhiu5uOXiSNvlmK0kH+FUtby9ECIFRI\nMVKQk0ZBYG5LrhLaiN/pKDUXHkmndHpF4kcVHwtq/KjmXhGGgHmj7sJA6WzJiufg\nayEi4tllC5c3Lb6Enq0pfapfpN4rpghtVOJS+GcnnBKMqfnIfW9+TXz7JvjxKBeX\n4XR9yoOzNVIAJ1JDC0AldvLNfohsG8AO3uuaWkMJdEdGr16wE+FPXt4iOeoASE1h\nCYI9Yy4r9CfZo36yiTTYRvW/ERGglt0Epj3Mim/0yTaMGPA5INqxNOtN5IfDPtA2\nKbXZsr3KnMpl87bO77I7sRUPaAG2eWNeiQOZ54InLOad93WvBeBpPGuV+KqHZwcA\nP89AGXwRpL53KVtqW3q172U+MpyPNu6hHPvAFfKux3Mbl2YF+uqqq0PBW0ABedZ5\nrey+p77UfP0n9zVdEMVJZ9+u2GOjyIJAPVD+SoxxrgfWt2yVl/QSyTcCAwEAAQ==\n-----END RSA PUBLIC KEY-----\n',
         '561028587478581259': '-----BEGIN RSA PUBLIC KEY-----\nMIICCgKCAgEA7OhNIVySH+vQ2cl+A50Wv4x+E/pdnjA7YSaTVf7tem5wz843+zgE\nLgKdHhOUCdS948/EI899pf8DKFt+8dMMruvz9w1/2DAUPT6sYjar3wGiGDkG1pYL\nPbg06u04hWjqNi1NOwMgJpPH40AIx/ls4ZkC5DVXrnfbvwZl+ol2pm6530oaDCnD\njd5km+TxR17Y68pRo8Nc2kb7aGt8OS4CgHmir2ALowIt4nrS3eeI+dyWjX2wqPkC\n+y6Eay77mINrZyvOt6apqvbnffmKMBHtFb2GN3G8goRy8P5pV0NiKm7O9TpTWnDt\nWTNxqXANNJENcdG+IKdAUM+Zfx2r20aY5n1BdtVbtgzxbbWUfStE6HoEtOB9jcsc\nccgELwnRgrPsRdv2jAGAEFuiNs3W0TIDHzUyE9g7d8BqCW9m2JvYZVfDrqTJ1UOR\n5vVcwSr2LjE9qYoDJmQ3I+bsXlAz/4p2/zEzy5+FuCKWqCjZr4lPWQ8RITEuGORs\nlVT/fHKnyV5gPEwdCaOZmMAHIpEkJbbAL3+lQRdQvdYA3l4EeU1GGcScbEsg85m2\nddBddF7Qmh+zM2K0TXEaVymL+IUuklOlhpFeApjjh/Ub2L/0Ma8FA6B4nuhQuRTx\nKe8Wy3EMmYWQlCiNh1fn6vWDyUGjHeKvHxijH42yyZ6jZa2vTwjno4kCAwEAAQ==\n-----END RSA PUBLIC KEY-----\n'
     },
+    server_mods_2026: {
+        '747889112438276198': null,
+        '651995021389856787': null,
+        '918461573733953556': null,
+        '318488506915749889': null,
+        '407133943045947392': null,
+        '650780602844446722': null,
+        '305929135136571393': null,
+        '315263573054062592': null,
+        '315251874951462913': null,
+        '596159575581917379': null,
+        '172108860285255681': null,     
+        '622949779852230677': null,
+    }
 }
