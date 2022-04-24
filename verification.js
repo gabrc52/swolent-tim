@@ -59,8 +59,6 @@ class Verifier {
         return cached;
     }
 
-    // TODO: move this to checking for comMIT instead of adMIT
-
     verify(guildMember) {
         const guild = guildMember.guild;
         const { channel, role } = this.get_cached(guild);
