@@ -148,7 +148,7 @@ const boomerconfessCommandDisambiguator = async (client, verifier, msg, args) =>
         } else if (is2025 || args[0] == 'boomerconfess25') {
             confessCommand(client, verifier.isCommit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel), 'Confession w/ boomers', config.server_mods, msg, args);
         } else if (is2026 || args[0] == 'boomerconfess26') {
-            confessCommand(client, verifier.is2026Admit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel_2026), config.server_mods_2026, msg, args);
+            confessCommand(client, verifier.is2026Admit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel_2026), 'Confession w/ boomers', config.server_mods_2026, msg, args);
         } else {
             msg.reply("This command is only available for people in the MIT 2025 or MIT 2026 servers. If you are, please verify. If it still doesn't work, let mods know");
         }
