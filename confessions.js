@@ -25,7 +25,13 @@ const logConfession = async (number, confession, confessAttachments, confessor, 
     const shares = sss.split(secret, { shares: numMods, threshold: Math.floor(numMods / 2) + 1 });
     for (let i = 0; i < shares.length; i++) {
         const fragment = `Confession #${number} fragment decrypted successfully: ${shares[i].toString('base64')}`;
-        const encryptedFragment = encryptWithPublicKey(fragment, publicKeys[i]);
+        let encryptedFragment = '*__ERROR__: No encrypted fragment.*';
+        if (publicKeys[i] === null) {
+            encryptedFragment = `${fragment}\n*__WARNING__: No public key provided. Confessions are encrypted but they're not protected against potential Discord token leaks.*`
+        } else {
+            encryptedFragment = encryptWithPublicKey(fragment, publicKeys[i]);
+        }
+        
         try {
             const user = await client.users.fetch(mods[i]);
             user.send(`**${confessionType} #${number}**: ${encryptedFragment}`);
