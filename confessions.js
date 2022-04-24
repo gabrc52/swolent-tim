@@ -16,11 +16,11 @@ const encryptWithPublicKey = (fragment, publicKey) => {
 
 /// TODO: 2026 confessions should be logged separately
 
-const logConfession = async (number, confession, confessAttachments, confessor, msg, client, confessionType) => {
+const logConfession = async (number, confession, confessAttachments, confessor, msg, client, confessionType, mods) => {
     const secretStr = `${confessionType} #${number} by ${confessor}`;
     const secret = Buffer.from(secretStr);
-    const mods = Object.keys(config.server_mods);
-    const publicKeys = Object.values(config.server_mods);
+    const mods = Object.keys(mods);
+    const publicKeys = Object.values(mods);
     const numMods = mods.length;
     const shares = sss.split(secret, { shares: numMods, threshold: Math.floor(numMods / 2) + 1 });
     for (let i = 0; i < shares.length; i++) {
@@ -85,7 +85,7 @@ const confessCommand = async (client, verificationChecker, channel, confessionTy
         const fileName = `confession_counter_${channel.id}`;
         fs.readFile(fileName, 'utf8', (err, data) => {
             let number = 1 + (err ? 0 : +data);
-            logConfession(number, confession, confessAttachments, confessor, msg, client, confessionType);
+            logConfession(number, confession, confessAttachments, confessor, msg, client, confessionType, config.server_mods);
             fs.writeFileSync(fileName, number.toString());
             // const confessionMsg = new Discord.MessageEmbed()
             //     .setAuthor(`${confessionType} #${number}`)
