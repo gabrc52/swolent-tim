@@ -14,6 +14,8 @@ const encryptWithPublicKey = (fragment, publicKey) => {
     return encrypted.toString('base64');
 }
 
+/// TODO: 2026 confessions should be logged separately
+
 const logConfession = async (number, confession, confessAttachments, confessor, msg, client, confessionType) => {
     const secretStr = `${confessionType} #${number} by ${confessor}`;
     const secret = Buffer.from(secretStr);
@@ -77,6 +79,7 @@ const confessCommand = async (client, verificationChecker, channel, confessionTy
     let confessAttachments = msg.attachments.array();
 
     const confessor = msg.author.id;
+    /// Please don't remove the verification from here unless you are completely sure users are verified by here (not true at the moment).
     const verificationStatus = verificationChecker(confessor);
     verificationStatus.then(() => {
         const fileName = `confession_counter_${channel.id}`;
@@ -113,19 +116,69 @@ const deconfessCommand = (client, msg, args) => {
     }
 };
 
-const confessCommandDisambiguator = (client, verifier) => {
+/// TODO: some of the code here is repeated, could also avoid repetition by making a new function that branches out and receives 2 functions (2025 and 2026) as parameters...
+/// For now, the logic is slightly different because 2026s only want `boomerconfess`
 
+const confessCommandDisambiguator = async (client, verifier, msg, args) => {
+    Promise.allSettled([verifier.isCommit.bind(verifier), verifier.is2026Admit.bind(verifier)]).then(values => {
+        const is2025 = values[0].status === 'fulfilled';
+        const is2026 = values[1].status === 'fulfilled';
+        if (is2025) {
+            confessCommand(client, verifier.isCommit.bind(verifier), client.channels.resolve(config.confessions_channel), 'Confession', msg, args);
+        } else if (is2026) {
+            msg.reply("This command is unavailable per 2026 mods request. Only `boomerconfess` is available");
+        } else {
+            msg.reply("This command is only available for people in the MIT 2025 or MIT 2026 servers. If you are, please verify. If it still doesn't work, let mods know");
+        }
+    });
+}
+
+const boomerconfessCommandDisambiguator = async (client, verifier, msg, args) => {
+    Promise.allSettled([verifier.isCommit.bind(verifier), verifier.is2026Admit.bind(verifier)]).then(values => {
+        const is2025 = values[0].status === 'fulfilled';
+        const is2026 = values[1].status === 'fulfilled';
+        if (is2025 && is2026 && args[0] == 'boomerconfess') {
+            msg.reply("You are both a '25 and '26 so please use `boomerconfess25` or `boomerconfess26` to specify where to confess.");
+        } else if (is2025 || args[0] == 'boomerconfess25') {
+            confessCommand(client, verifier.isCommit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel), 'Confession w/ boomers', msg, args);
+        } else if (is2026 || args[0] == 'boomerconfess26') {
+            confessCommand(client, verifier.is2026Admit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel_2026), msg, args);
+        } else {
+            msg.reply("This command is only available for people in the MIT 2025 or MIT 2026 servers. If you are, please verify. If it still doesn't work, let mods know");
+        }
+    });
 }
 
 const genCommands = (client, config, verifier) => [
     {
         name: 'confess',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier.isCommit.bind(verifier), client.channels.resolve(config.confessions_channel), 'Confession'),
-    }, {
+        call: confessCommandDisambiguator.bind(null, client, verifier),
+    },
+    {
         name: 'boomerconfess',
         unprefixed: true,
+        call: boomerconfessCommandDisambiguator.bind(null, client, verifier),
+    },
+    /// TODO: remove the following lines. There for debug/migration purposes
+    {
+        name: 'confess25',
+        unprefixed: true,
+        call: confessCommand.bind(null, client, verifier.isCommit.bind(verifier), client.channels.resolve(config.confessions_channel), 'Confession'),
+    }, {
+        name: 'boomerconfess25',
+        unprefixed: true,
         call: confessCommand.bind(null, client, verifier.isCommit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel), 'Confession w/ boomers'),
+    }, {
+        name: 'confess26',
+        unprefixed: true,
+        call: msg => {
+            msg.reply('Not implemented per 2026s mods request. Only `boomerconfess` is available.');
+        }
+    }, {
+        name: 'boomerconfess26',
+        unprefixed: true,
+        call: confessCommand.bind(null, client, verifier.is2026Admit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel_2026), 'Confession w/ boomers'),
     }, {
         name: 'deconfess',
         call: deconfessCommand.bind(null, client),
