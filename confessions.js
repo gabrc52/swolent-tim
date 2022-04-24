@@ -149,17 +149,21 @@ const boomerconfessCommandDisambiguator = async (client, verifier, msg, args) =>
     });
 }
 
-const tmpDebug = async (client, verifier, msg, args) => {
+const tmpDebug = (msg) => {
     Promise.allSettled([verifier.isCommit.bind(verifier), verifier.is2026Admit.bind(verifier)]).then(values => {
+        console.log(values);
+        console.log(JSON.stringify(values));
         msg.reply(JSON.stringify(values));
     });
 }
 
 const genCommands = (client, config, verifier) => [
     {
-        name: 'tmpDebug',
-        unprefixed: true,
-        call: tmpDebug.bind(null, client, verifier),
+        name: 'tmpdebug',
+        unprefixed: false,
+        call: msg => {
+            tmpDebug(msg);
+        },
     },
     {
         name: 'confess',
