@@ -27,7 +27,7 @@ const logConfession = async (number, confession, confessAttachments, confessor, 
         const fragment = `Confession #${number} fragment decrypted successfully: ${shares[i].toString('base64')}`;
         let encryptedFragment = '*__ERROR__: No encrypted fragment.*';
         if (publicKeys[i] === null) {
-            encryptedFragment = `${fragment}\n*__WARNING__: No public key provided. Confessions are encrypted but they're not protected against potential Discord token leaks.*`
+            encryptedFragment = `${shares[i].toString('base64')}\n*__WARNING__: No public key provided. Confessions are encrypted but they're not protected against potential Discord token leaks.*`
         } else {
             encryptedFragment = encryptWithPublicKey(fragment, publicKeys[i]);
         }
