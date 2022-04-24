@@ -48,7 +48,7 @@ const logConfession = async (number, confession, confessAttachments, confessor, 
  * @param {Discord.Client} client 
  */
 
-const confessCommand = async (client, verifier, channel, confessionType, msg, args) => {
+const confessCommand = async (client, verificationChecker, channel, confessionType, msg, args) => {
     // TODO: Move this body into a class so we can persist some state
     let confession = msg.content.substr(args[0].length + 1).trim();
     /// Remove brackets
@@ -77,7 +77,7 @@ const confessCommand = async (client, verifier, channel, confessionType, msg, ar
     let confessAttachments = msg.attachments.array();
 
     const confessor = msg.author.id;
-    const verificationStatus = verifier.isCommit(confessor);
+    const verificationStatus = verificationChecker(confessor);
     verificationStatus.then(() => {
         const fileName = `confession_counter_${channel.id}`;
         fs.readFile(fileName, 'utf8', (err, data) => {
@@ -113,15 +113,19 @@ const deconfessCommand = (client, msg, args) => {
     }
 };
 
+const confessCommandDisambiguator = (client, verifier) => {
+
+}
+
 const genCommands = (client, config, verifier) => [
     {
         name: 'confess',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier, client.channels.resolve(config.confessions_channel), 'Confession'),
+        call: confessCommand.bind(null, client, verifier.isCommit, client.channels.resolve(config.confessions_channel), 'Confession'),
     }, {
         name: 'boomerconfess',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier, client.channels.resolve(config.boomer_confessions_channel), 'Confession w/ boomers'),
+        call: confessCommand.bind(null, client, verifier.isCommit, client.channels.resolve(config.boomer_confessions_channel), 'Confession w/ boomers'),
     }, {
         name: 'deconfess',
         call: deconfessCommand.bind(null, client),
