@@ -1,4 +1,4 @@
-module.exports = {
+export = {
     starboard: {
         reaction_threshold: 7,
         embed_color: '#fcaa32',

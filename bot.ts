@@ -1,15 +1,21 @@
-const Discord = require('discord.js');
-const config = require('./config');
-const breakout = require('./breakout');
-const getVerifyLink = require('./verification').getVerifyLink;
-const { readFileSync } = require('fs');
+import { Client } from 'discord.js';
+import config = require('./config');
+import * as breakout from './breakout';
+import { getVerifyLink } from './verification';
+import { readFileSync } from 'fs';
+
+import type { Message, Snowflake, TextChannel } from 'discord.js';
+
+interface CommandTable {
+	[index: string]: (msg: Message, args: string[], client: Client) => void;
+}
 
 /// From https://discordjs.guide/popular-topics/reactions.html#awaiting-reactions
-const client = new Discord.Client({
+const client = new Client({
     partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
     disableMentions: 'everyone',
 });
-const commands = {};
+const commands: CommandTable = {};
 const prefix = 'tim.';
 
 const modules = ['commands', 'confessions', 'starboard', 'verification'];
@@ -28,7 +34,7 @@ client.on('ready', () => {
             commands[prefix + name] = cmd.call;
         }
     }
-    console.log(`Logged in as ${client.user.tag}!`);
+    console.log(`Logged in as ${client.user!.tag}!`);
 });
 
 client.on('message', msg => {
@@ -44,11 +50,11 @@ client.on('message', msg => {
 client.on('guildMemberUpdate', (oldMember, newMember) => {
     const guild = client.guilds.cache.get(config.guild_2025);
 
-    const wasGivenRole = role => !oldMember.roles.cache.get(role) && newMember.roles.cache.get(role);
+    const wasGivenRole = (role: Snowflake) => !oldMember.roles.cache.get(role) && newMember.roles.cache.get(role);
 
     if (newMember.guild == guild) {
         if (wasGivenRole(config.verification.admitted_role) || (wasGivenRole(config.verification.verified_role) && !oldMember.roles.cache.get(config.verification.admitted_role))) {
-            const channel = guild.channels.cache.get(config.welcome_channel);
+            const channel = guild.channels.cache.get(config.welcome_channel) as TextChannel;
             const user = newMember.user;
             channel.send(`${user}, welcome to MIT '25! Please head over to <#783439183888384031> to get tags for pronouns, regions, etc., and if you're new to Discord, <#789592290518892545> will explain how to use this platform! Then you can introduce yourself in <#783438962756288529>. \n\nP.S. We have upperclassfolx residing in <#783818929961173002> (they are quarantined to specific channels).`);
         }
