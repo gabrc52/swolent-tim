@@ -1,17 +1,24 @@
-const got = require('got');
-const pepper = require('./pepper');
-const breakout = require('./breakout');
-const { exec } = require("child_process");
+import got from 'got';
+import pepper = require('./pepper');
+import * as breakout from './breakout';
+import { exec } from "child_process";
 
-const setup = (client, config) => [
+import type { Client, Message, Snowflake } from 'discord.js';
+
+interface CommandSetup {
+    server_mods: Snowflake[],
+    guild_2025: Snowflake,
+}
+
+const setup = (client: Client, config: CommandSetup) => [
     {
         name: 'ping',
-        call: msg => {
+        call: (msg: Message) => {
             msg.channel.send(`Pong, ${msg.author}! The channel is ${msg.channel}.`);
         }
     }, {
         name: 'taken',
-        call: async (msg, args) => {
+        call: async (msg: Message, args: string[]) => {
             if (!args[1]) {
                 msg.reply("Please specify a possible kerb to know if it's taken or not (for example: `tim.taken stress`).");
             } else {
@@ -34,7 +41,7 @@ const setup = (client, config) => [
         }
     }, {
         name: 'listinfo',
-        call: async (msg, args) => {
+        call: async (msg: Message, args: string[]) => {
             if (msg.content.trim() === 'tim.listinfo') {
                 msg.reply("Please specify a mailing list to see its info (for example: `tim.listinfo plont`).");
             } else {
@@ -51,19 +58,19 @@ const setup = (client, config) => [
         }
     }, {
         name: 'time',
-        call: msg => msg.channel.send(`The time is ${new Date()}`)
+        call: (msg: Message) => msg.channel.send(`The time is ${new Date()}`)
     }, {
         name: 'cwd',
-        call: msg => msg.channel.send(`The working directory is ${process.cwd()}`)
+        call: (msg: Message) => msg.channel.send(`The working directory is ${process.cwd()}`)
     }, {
         name: 'fillTheBreakoutRooms',
-        call: async (msg, args) => {
+        call: async (msg: Message, args: string[]) => {
             msg.reply('Ok, filling breakout rooms...');
             await breakout.fillBreakoutRooms(client);
         }
     }, {
         name: 'revision',
-        call: msg => {
+        call: (msg: Message) => {
             // TODO: Pull in a git lib or parse .git/HEAD by hand? Summoning ref by hand is dangerous
             exec('git rev-parse HEAD', (error, stdout, stderr) => {
                 if (error) {
@@ -75,13 +82,22 @@ const setup = (client, config) => [
         }
     }, {
         name: 'update',
-        call: msg => {
+        call: (msg: Message) => {
             if (Object.keys(config.server_mods).includes(msg.author.id)) {
                 /// TODO: do something more ~elegant~
                 exec('git pull', async (error, stdout, stderr) => {
+                    if (error) {
+                        throw error;
+                    }
                     await msg.reply(`${stdout}\n${stderr}`);
-                    await msg.reply('Restarting, please wait a minute...');
-                    process.exit();
+                    exec('tsc', async (error, stdout, stderr) => {
+                        if (error) {
+                            throw error;
+                        }
+                        await msg.reply(`${stdout}\n${stderr}`);
+                        await msg.reply('Restarting, please wait a minute...');
+                        process.exit();
+                    });
                 });
             } else {
                 msg.reply('You do not have permission to run this command.');
@@ -89,8 +105,8 @@ const setup = (client, config) => [
         }
     }, {
         name: 'exec',
-        call: (msg, args) => {
-            if (msg.guild.id !== config.guild_2025) {
+        call: (msg: Message, args: string[]) => {
+            if (msg.guild?.id !== config.guild_2025) {
                 msg.reply('Wrong guild!');
             } else if (Object.keys(config.server_mods).includes(msg.author.id)) {
                 const cmd = msg.content.substr(args[0].length + 1).trim();

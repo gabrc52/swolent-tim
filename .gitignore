@@ -2,7 +2,7 @@
 node_modules
 
 # The Token
-token.js
+token.ts
 token.txt
 
 # Files created by bot
@@ -10,7 +10,10 @@ starboard
 confession_counter_*
 
 # Role Assignment script (as it contains sensitive Discord IDs)
-role-assign.js
+role-assign.ts
 
 # The pepper for verification
-pepper.js
+pepper.ts
+
+# all JS files, due to typescript
+*.js

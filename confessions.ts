@@ -1,14 +1,31 @@
-const fs = require('fs');
-const Discord = require('discord.js');
-const sss = require('shamirs-secret-sharing');
-const config = require('./config');
-const verification = require('./verification');
-const crypto = require('crypto');
+import fs = require('fs');
+import sss = require('shamirs-secret-sharing-ts');
+import config = require('./config');
+import verification = require('./verification');
+import crypto = require('crypto');
+
+import type { Client, TextChannel, Message, MessageAttachment, Snowflake } from 'discord.js';
+
+interface ConfessionsSetup {
+    confessions_channel: Snowflake,
+    boomer_confessions_channel: Snowflake,
+    boomer_confessions_channel_2026: Snowflake,
+    server_mods: ModMap,
+    server_mods_2026: ModMap,
+}
+
+interface ModMap {
+	[key: Snowflake]: string | null;
+}
+
+type ConfessionType = 'Confession' | 'Confession w/ boomers';
+
+type VerifierFn = (id: Snowflake) => Promise<void>;
 
 /// Accepts the base64 shamir fragment and the public key
 /// Returns an encrypted string (probably base64 as well) with the encrypted shamir fragment
 /// which will be sent through Discord DM
-const encryptWithPublicKey = (fragment, publicKey) => {
+const encryptWithPublicKey = (fragment: string, publicKey: string) => {
     const buffer = Buffer.from(fragment, 'utf8');
     const encrypted = crypto.publicEncrypt(publicKey, buffer);
     return encrypted.toString('base64');
@@ -16,24 +33,27 @@ const encryptWithPublicKey = (fragment, publicKey) => {
 
 /// TODO: 2026 confessions should be logged separately
 
-const logConfession = async (number, confession, confessAttachments, confessor, msg, client, confessionType, modsDict) => {
+const zip = <T, U>(a: T[], b: U[]) => a.map((x, i) => [x, b[i]]);
+
+const logConfession = async (number: number, confession: string, confessAttachments: MessageAttachment[], confessor: Snowflake, msg: Message, client: Client, confessionType: ConfessionType, modsDict: ModMap) => {
     const secretStr = `${confessionType} #${number} by ${confessor}`;
     const secret = Buffer.from(secretStr);
     const mods = Object.keys(modsDict);
     const publicKeys = Object.values(modsDict);
     const numMods = mods.length;
     const shares = sss.split(secret, { shares: numMods, threshold: Math.floor(numMods / 2) + 1 });
-    for (let i = 0; i < shares.length; i++) {
-        const fragment = `Confession #${number} fragment decrypted successfully: ${shares[i].toString('base64')}`;
+    for (const [mod, share] of zip(mods, shares)) {
+        const pubkey = modsDict[mod];
+        const fragment = `Confession #${number} fragment decrypted successfully: ${share.toString('base64')}`;
         let encryptedFragment = '*__ERROR__: No encrypted fragment.*';
-        if (publicKeys[i] === null) {
-            encryptedFragment = `${shares[i].toString('base64')}\n*__WARNING__: No public key provided. Confessions are encrypted but they're not protected against potential Discord token leaks.*`
+        if (pubkey === null) {
+            encryptedFragment = `${share.toString('base64')}\n*__WARNING__: No public key provided. Confessions are encrypted but they're not protected against potential Discord token leaks.*`
         } else {
-            encryptedFragment = encryptWithPublicKey(fragment, publicKeys[i]);
+            encryptedFragment = encryptWithPublicKey(fragment, pubkey);
         }
         
         try {
-            const user = await client.users.fetch(mods[i]);
+            const user = await client.users.fetch(mod);
             user.send(`**${confessionType} #${number}**: ${encryptedFragment}`);
             if(confessAttachments.length > 0){
                 user.send({
@@ -44,19 +64,19 @@ const logConfession = async (number, confession, confessAttachments, confessor, 
                 user.send(`${confession}`);
             }
         } catch (e) {
-            msg.reply(e);
+            msg.reply((e as any).toString());
         }
     }
 };
 
 /**
  * Confess command
- * @param {Discord.Message} msg 
+ * @param {Message} msg 
  * @param {Array<String>} args 
- * @param {Discord.Client} client 
+ * @param {Client} client 
  */
 
-const confessCommand = async (client, verificationChecker, channel, confessionType, modsDict, msg, args) => {
+const confessCommand = async (client: Client, verificationChecker: VerifierFn, channel: TextChannel, confessionType: ConfessionType, modsDict: ModMap, msg: Message, args: string[]) => {
     // TODO: Move this body into a class so we can persist some state
     let confession = msg.content.substr(args[0].length + 1).trim();
     /// Remove brackets
@@ -110,9 +130,9 @@ const confessCommand = async (client, verificationChecker, channel, confessionTy
     }).catch(error => msg.reply(`Can't confess: ${error}`));
 };
 
-const deconfessCommand = (client, msg, args) => {
+const deconfessCommand = (client: Client, msg: Message, args: string[]) => {
     const fragmentStrings = args.slice(1);
-    const numMods = config.server_mods.length;
+    const numMods = Object.keys(config.server_mods).length;
     const neededFragments = Math.ceil(numMods / 2);
     if (fragmentStrings.length < neededFragments) {
         msg.reply(`Please enter at least ${neededFragments} deconfession fragments.`);
@@ -125,12 +145,12 @@ const deconfessCommand = (client, msg, args) => {
 /// TODO: some of the code here is repeated, could also avoid repetition by making a new function that branches out and receives 2 functions (2025 and 2026) as parameters...
 /// For now, the logic is slightly different because 2026s only want `boomerconfess`
 
-const confessCommandDisambiguator = async (client, verifier, msg, args) => {
+const confessCommandDisambiguator = async (client: Client, verifier: verification.Verifier, msg: Message, args: string[]) => {
     Promise.allSettled([verifier.isCommit(msg.author.id), verifier.is2026Commit(msg.author.id)]).then(values => {
         const is2025 = values[0].status === 'fulfilled';
         const is2026 = values[1].status === 'fulfilled';
         if (is2025) {
-            confessCommand(client, verifier.isCommit.bind(verifier), client.channels.resolve(config.confessions_channel), 'Confession', config.server_mods, msg, args);
+            confessCommand(client, verifier.isCommit.bind(verifier), client.channels.resolve(config.confessions_channel) as TextChannel, 'Confession', config.server_mods, msg, args);
         } else if (is2026) {
             msg.reply("This command is unavailable per 2026 mods request. Only `boomerconfess` is available");
         } else {
@@ -139,23 +159,23 @@ const confessCommandDisambiguator = async (client, verifier, msg, args) => {
     });
 }
 
-const boomerconfessCommandDisambiguator = async (client, verifier, msg, args) => {
+const boomerconfessCommandDisambiguator = async (client: Client, verifier: verification.Verifier, msg: Message, args: string[]) => {
     Promise.allSettled([verifier.isCommit(msg.author.id), verifier.is2026Commit(msg.author.id)]).then(values => {
         const is2025 = values[0].status === 'fulfilled';
         const is2026 = values[1].status === 'fulfilled';
         if (is2025 && is2026 && args[0] == 'boomerconfess') {
             msg.reply("You are both a '25 and '26 so please use `boomerconfess25` or `boomerconfess26` to specify where to confess.");
         } else if (is2025 || args[0] == 'boomerconfess25') {
-            confessCommand(client, verifier.isCommit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel), 'Confession w/ boomers', config.server_mods, msg, args);
+            confessCommand(client, verifier.isCommit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel) as TextChannel, 'Confession w/ boomers', config.server_mods, msg, args);
         } else if (is2026 || args[0] == 'boomerconfess26') {
-            confessCommand(client, verifier.is2026Commit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel_2026), 'Confession w/ boomers', config.server_mods_2026, msg, args);
+            confessCommand(client, verifier.is2026Commit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel_2026) as TextChannel, 'Confession w/ boomers', config.server_mods_2026, msg, args);
         } else {
             msg.reply("This command is only available for people in the MIT 2025 or MIT 2026 servers. If you are, please verify. If it still doesn't work, let mods know");
         }
     });
 }
 
-const genCommands = (client, config, verifier) => [
+const genCommands = (client: Client, config: ConfessionsSetup, verifier: verification.Verifier) => [
     {
         name: 'confess',
         unprefixed: true,
@@ -166,18 +186,19 @@ const genCommands = (client, config, verifier) => [
         unprefixed: true,
         call: boomerconfessCommandDisambiguator.bind(null, client, verifier),
     },
+    /// TODO: remove the following lines. There for debug/migration purposes
     {
         name: 'confess25',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier.isCommit.bind(verifier), client.channels.resolve(config.confessions_channel), 'Confession', config.server_mods),
+        call: confessCommand.bind(null, client, verifier.isCommit.bind(verifier), client.channels.resolve(config.confessions_channel) as TextChannel, 'Confession', config.server_mods),
     }, {
         name: 'boomerconfess25',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier.isCommit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel), 'Confession w/ boomers', config.server_mods),
+        call: confessCommand.bind(null, client, verifier.isCommit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel) as TextChannel, 'Confession w/ boomers', config.server_mods),
     }, {
         name: 'confess26',
         unprefixed: true,
-        call: msg => {
+        call: (msg: Message) => {
             msg.reply('Not implemented per 2026s mods request. Only `boomerconfess` is available.');
         }
     }, {
@@ -190,5 +211,5 @@ const genCommands = (client, config, verifier) => [
     }
 ];
 module.exports = {
-	setup: (client, config) => genCommands(client, config, new verification.Verifier(client, config)),
+	setup: (client: Client, config: any) => genCommands(client, config as ConfessionsSetup, new verification.Verifier(client, config)),
 };

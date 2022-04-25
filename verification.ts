@@ -1,12 +1,39 @@
-const got = require('got');
-const pepper = require('./pepper');
-const sha256 = require('js-sha256').sha256;
+import got from 'got';
+import pepper = require('./pepper');
+import { sha256 } from "js-sha256";
 
-class Verifier {
-    constructor(client, config) {
-        this.base_guild = client.guilds.cache.get(config.guild_2025);
-        this.guild_2026 = client.guilds.cache.get(config.guild_2026);
-        /// WARNING: this isn't the full config, just a subset, so if you try to call other parts, it will silently fail
+import type { Client, Guild, GuildMember, Message, MessageReaction, Role, Snowflake, TextChannel, User, PartialUser } from "discord.js";
+
+interface VerifySetup {
+    guild_2025: Snowflake,
+    guild_2026: Snowflake,
+    verification: VerifyConfig,
+}
+
+interface VerifyConfig {
+    guild_2025: Snowflake,
+    role_for_2026s_in_2025_server: Snowflake,
+    guild_2026: Snowflake,
+    verified_role: Snowflake,
+    verified_role_2026: Snowflake,
+    target_channel: Snowflake,
+    target_role: Snowflake,
+}
+
+interface CacheEntry {
+    channel: TextChannel,
+    role: Role,
+}
+
+export class Verifier {
+    base_guild: Guild;
+    guild_2026: Guild;
+    config: VerifyConfig;
+    verify_cache: { [key: string]: CacheEntry };
+
+    constructor(client: Client, config: VerifySetup) {
+        this.base_guild = client.guilds.cache.get(config.guild_2025)!;
+        this.guild_2026 = client.guilds.cache.get(config.guild_2026)!;
         this.config = config.verification;
         this.verify_cache = {};
 
@@ -20,14 +47,14 @@ class Verifier {
      * Resolve with a nullary value, or reject with an error message.
      * @param {string} id the id of the person to check
      */
-    async isCommit(id) {
+    async isCommit(id: Snowflake) {
         const guildMember = this.base_guild.members.cache.get(id);
         if (!guildMember) {
-            throw "You're not in the MIT 2025 server."
+            throw "You're not in the MIT 2025 server.";
         } else {
             const role = guildMember.roles.cache.get(this.config.verified_role);
             if (!role) {
-                throw "Swole Tim hasn't verified you in the MIT 2025 server. Please follow the instructions to verify there."
+                throw "Swole Tim hasn't verified you in the MIT 2025 server. Please follow the instructions to verify there.";
             }
         }
     }
@@ -37,7 +64,7 @@ class Verifier {
      * Check if Discord user is verified as commited to the member of the class of 2026.
      * @param {string} id the id of the person to check 
      */
-    async is2026Commit(id) {
+    async is2026Commit(id: Snowflake) {
         const guildMember = this.guild_2026.members.cache.get(id);
         if (!guildMember) {
             throw "You're not in the MIT 2026 server."
@@ -49,26 +76,24 @@ class Verifier {
         }
     }
 
-    get_cached(guild) {
+    get_cached(guild: Guild) {
         // ensure entry exists
         this.verify_cache[guild.id] = (this.verify_cache[guild.id] || {});
         const cached = this.verify_cache[guild.id];
         // if they don't exist, try populating them
-        cached.channel = (cached.channel || guild.channels.cache.find(c => c.name === this.config.target_channel));
+        cached.channel = (cached.channel || guild.channels.cache.find(c => c.name === this.config.target_channel) as TextChannel); // TODO check cast
         cached.role = (cached.role || guild.roles.cache.find(r => r.name === this.config.target_role));
         // return the values we got
         return cached;
     }
 
-    /// For automatic verification based on your roles in 2025/2026 server
-    /// Returns a boolean signaling if a verified role was successfully assigned
-    async verify(guildMember) {
+    async verify(guildMember: GuildMember) {
         const guild = guildMember.guild;
         if (guild == this.base_guild) {
             /// Give 2026 role to 2026s who join the 2025 server
             try {
                 await this.is2026Commit(guildMember.id);
-                const role_2026 = guild.roles.resolve(this.config.role_for_2026s_in_2025_server);
+                const role_2026 = guild.roles.resolve(this.config.role_for_2026s_in_2025_server)!; // TODO check cast
                 guildMember.roles.add(role_2026);
                 return true;
             } catch (e) {
@@ -105,54 +130,37 @@ class Verifier {
  * @param {*} classOf Class of the person verifying (2025 or 2026)
  * @returns The link that will verify this specific user
  */
-const getVerifyLink = (id, classOf) => {
+export const getVerifyLink = (id: string, classOf: string) => {
     return `https://discord2025.mit.edu:444/verify${classOf}.php?id=${id}&auth=${sha256(`${pepper}:${id}`)}`;
 }
 
 // I know singletons are discouraged,
 // but in this case we really do only need one verifier.
 // It's cleaner than passing around one per client, at any rate
-let verifier = null;
+let verifier: Verifier | null = null;
 
-const sendVerificationDm = (user, classOf) => {
+const sendVerificationDm = (user: User | PartialUser, classOf: string) => {
     user.send(`To verify that you're a comMIT please click on the following link: ${getVerifyLink(user.id, classOf)}`);
 };
 
-const genCommands = (verifier, config) => [
+const genCommands = (verifier: Verifier, config: VerifySetup) => [
     {
         name: 'verify',
-        call: msg => {
+        call: (msg: Message) => {
             const id = msg.author.id;
-            if (msg.channel.type === 'dm' || msg.guild.id == config.guild_2025) {
-                sendVerificationDm(msg.author, 2025);
+            if (msg.channel.type === 'dm' || msg.guild?.id == config.guild_2025) {
+                sendVerificationDm(msg.author, '2025');
             } else {
-                const guildMember = msg.guild.members.cache.get(id);
-                verifier.verify(guildMember);
-            }
-        }
-    }, {
-        name: 'verify26',
-        unprefixed: true,
-        call: msg => {
-            if (msg.guild.id == config.guild_2025) {
-                const verification = verifier.is2026Commit(msg.author.id);
-                verification
-                    .then(() => {
-                        const guildMember = msg.guild.members.cache.get(msg.author.id);
-                        const role_2026 = msg.guild.roles.resolve(config.role_for_2026s_in_2025_server);
-                        guildMember.roles.add(role_2026);
-                    })
-                    .catch(error => {
-                        msg.reply(`${error}`);
-                    });
-            } else {
-                sendVerificationDm(msg.author, 2026);
+                const guildMember = msg.guild?.members.cache.get(id);
+                if (guildMember) {
+                    verifier.verify(guildMember);
+                }
             }
         }
     }, {
         name: 'whitelist',
         unprefixed: true,
-        call: (msg, args) => {
+        call: (msg: Message, args: string[]) => {
             if (!args[1]) {
                 msg.reply("Please specify a username after `whitelist` to get whitelisted");
             } else {
@@ -172,13 +180,13 @@ const genCommands = (verifier, config) => [
     }
 ];
 
-const setup = (client, config) => {
+const setup = (client: Client, config: any) => {
     if (verifier) {
         throw new Error("Verifier already setup!");
     }
-    verifier = new Verifier(client, config);
-    client.on('guildMemberAdd', async member => {
-        const roleSuccess = await verifier.verify(member);
+    verifier = new Verifier(client, config as VerifySetup);
+    client.on('guildMemberAdd', async (member: GuildMember) => {
+        const roleSuccess = await verifier!.verify(member);
 
         /// don't make 2026s get a DM asking them to verify as 2025s
         if (roleSuccess) {
@@ -188,7 +196,7 @@ const setup = (client, config) => {
         if (member.guild.id == config.guild_2025) {
             member.send(`Hi! I'm Tim. In order to get verified as a member of the class of 2025, please click on the following link:
     
-${getVerifyLink(member.id, 2025)}
+${getVerifyLink(member.id, '2025')}
     
 Once you're in the server, please check out #rules-n-how-to-discord, get roles in #roles, and don't forget to introduce yourself to your fellow adMITs in #introductions!`);
         }
@@ -199,14 +207,15 @@ Once you're in the server, please check out #rules-n-how-to-discord, get roles i
 ${getVerifyLink(member.id, '')}`);
         }
     });
-    client.on('messageReactionAdd', (reaction, user) => {
+    client.on('messageReactionAdd', (reaction: MessageReaction, user: User | PartialUser) => {
         if (reaction.emoji.name === 'verifyme') {
-            if (reaction.message.guild.id == config.guild_2025) {
-                sendVerificationDm(user, 2025);
-            } else if (reaction.message.guild.id == config.guild_intl) {
+            const rxn_id = reaction.message.guild?.id;
+            if (rxn_id == config.guild_2025) {
+                sendVerificationDm(user, '2025');
+            } else if (rxn_id == config.guild_intl) {
                 sendVerificationDm(user, '');
-            } else if (reaction.message.guild.id == config.guild_2026) {
-                sendVerificationDm(user, 2026);
+            } else if (rxn_id == config.guild_2026) {
+                sendVerificationDm(user, '2026');
             }
         }
     });
