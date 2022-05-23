@@ -155,20 +155,7 @@ const boomerconfessCommandDisambiguator = async (client, verifier, msg, args) =>
     });
 }
 
-const tmpDebug = (client, verifier, msg) => {
-    Promise.allSettled([verifier.isCommit(msg.author.id), verifier.is2026Admit(msg.author.id)]).then(values => {
-        console.log(values);
-        console.log(JSON.stringify(values));
-        msg.reply(JSON.stringify(values));
-    });
-}
-
 const genCommands = (client, config, verifier) => [
-    {
-        name: 'tmpdebug',
-        unprefixed: false,
-        call: tmpDebug.bind(null, client, verifier),
-    },
     {
         name: 'confess',
         unprefixed: true,
