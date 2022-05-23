@@ -112,6 +112,7 @@ const genCommands = (verifier, config) => [
         }
     }, {
         name: 'verify26',
+        unprefixed: true,
         call: msg => {
             sendVerificationDm(msg.author, 2026);
         }
