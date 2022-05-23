@@ -60,8 +60,8 @@ if (!isset($_SERVER['SSL_CLIENT_S_DN_Email'])) {
 }
 
 /// Check for duplicates
-$numDiscordsByKerb = mysqli_num_rows(mysqli_query($connection, "SELECT discord FROM kerbs where kerb=\"$kerb\""));
-$numKerbsByDiscord = mysqli_num_rows(mysqli_query($connection, "SELECT kerb FROM kerbs where discord=\"$member\""));
+$numDiscordsByKerb = mysqli_num_rows(mysqli_query($connection, "SELECT discord FROM kerbs26 where kerb=\"$kerb\""));
+$numKerbsByDiscord = mysqli_num_rows(mysqli_query($connection, "SELECT kerb FROM kerbs26 where discord=\"$member\""));
 if ($numKerbsByDiscord > 0) {
 	die("You have already verified this Discord account, no need to do it again! If you need help, please contact staff by DM or 2025discordadmin@mit.edu.");
 }
@@ -91,7 +91,7 @@ $swoleVerified = $swoleVerified ? 1 : 0;
 /// Save into database
 
 $now = time();
-$insert_query = "INSERT INTO kerbs (kerb, discord, timestamp, swole) VALUES (\"$kerb\", $member, $now, $swoleVerified)";
+$insert_query = "INSERT INTO kerbs26 (kerb, discord, timestamp, swole) VALUES (\"$kerb\", $member, $now, $swoleVerified)";
 $insert_result = mysqli_query($connection, $insert_query);
 
 if (!$insert_result) {
