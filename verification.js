@@ -79,8 +79,14 @@ class Verifier {
     }
 }
 
-const getVerifyLink = id => {
-    return `https://discord2025.scripts.mit.edu:444/verify.php?id=${id}&auth=${sha256(`${pepper}:${id}`)}`;
+/**
+ * Get a verification link for the Discord user
+ * @param {*} id Discord ID of the person verifying
+ * @param {*} classOf Class of the person verifying (2025 or 2026)
+ * @returns The link that will verify this specific user
+ */
+const getVerifyLink = (id, classOf) => {
+    return `https://discord2025.scripts.mit.edu:444/verify${classOf}.php?id=${id}&auth=${sha256(`${pepper}:${id}`)}`;
 }
 
 // I know singletons are discouraged,
@@ -88,8 +94,8 @@ const getVerifyLink = id => {
 // It's cleaner than passing around one per client, at any rate
 let verifier = null;
 
-const sendVerificationDm = user => {
-    user.send(`To verify that you're a comMIT please click on the following link: ${getVerifyLink(user.id)}`);
+const sendVerificationDm = (user, classOf) => {
+    user.send(`To verify that you're a comMIT please click on the following link: ${getVerifyLink(user.id, classOf)}`);
 };
 
 const genCommands = (verifier, config) => [
@@ -98,11 +104,16 @@ const genCommands = (verifier, config) => [
         call: msg => {
             const id = msg.author.id;
             if (msg.channel.type === 'dm' || msg.guild.id == config.guild_2025) {
-                sendVerificationDm(msg.author);
+                sendVerificationDm(msg.author, 2025);
             } else {
                 const guildMember = msg.guild.members.cache.get(id);
                 verifier.verify(guildMember);
             }
+        }
+    }, {
+        name: 'verify26',
+        call: msg => {
+            sendVerificationDm(msg.author, 2026);
         }
     }, {
         name: 'whitelist',
