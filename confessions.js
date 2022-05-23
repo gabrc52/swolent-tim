@@ -166,7 +166,6 @@ const genCommands = (client, config, verifier) => [
         unprefixed: true,
         call: boomerconfessCommandDisambiguator.bind(null, client, verifier),
     },
-    /// TODO: remove the following lines. There for debug/migration purposes
     {
         name: 'confess25',
         unprefixed: true,
