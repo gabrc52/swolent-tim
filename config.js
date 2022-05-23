@@ -48,8 +48,6 @@ module.exports = {
         '315251874951462913': null,
         '596159575581917379': null,
         '172108860285255681': null,     
-        '622949779852230677': null,
-        // Adding myself temporarily for testing purposes
-        '426919521044135938': null,
+        '622949779852230677': null
     }
 }
