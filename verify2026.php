@@ -12,6 +12,9 @@ error_reporting(E_ALL);
 /// Since it's impossible to register every possible combination, saving them into a
 /// cookie is the only solution I can think of to keep the parameters after authentication
 
+/// TODO: A search on stackoverflow says that's what the state parameter is for. Implement that
+/// https://stackoverflow.com/questions/55524480/should-dynamic-query-parameters-be-present-in-the-redirection-uri-for-an-oauth2
+
 if (!isset($_SERVER['SSL_CLIENT_S_DN_Email']) && (isset($_GET['id']) || isset($_GET['auth']))) {
     /// I'm checking for cert here so using cert authentication doesn't require having cookies enabled
     if (isset($_GET['id'])) {
