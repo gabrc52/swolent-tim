@@ -5,6 +5,25 @@ ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
+/// Move GET parameters to a cookie.
+
+/// This is because OAuth says the URL to redirect to "MUST exactly match one
+/// of the Redirection URI values for the Client pre-registered at the OpenID Provider"
+/// Since it's impossible to register every possible combination, saving them into a
+/// cookie is the only solution I can think of to keep the parameters after authentication
+
+if (!isset($_SERVER['SSL_CLIENT_S_DN_Email']) && (isset($_GET['id']) || isset($_GET['auth']))) {
+    /// I'm checking for cert here so using cert authentication doesn't require having cookies enabled
+    if (isset($_GET['id'])) {
+        setcookie('id', $_GET['id']);
+    }
+    if (isset($_GET['auth'])) {
+        setcookie('auth', $_GET['auth']);
+    }
+    header("Location: https://discord2025.mit.edu/verify2026.php");   
+}
+
+
 /// Code to make POST requests, used for OpenID/OAuth
 /// Reference: https://www.php.net/manual/en/context.http.php
 function post($url, $args) {
@@ -88,16 +107,16 @@ if (substr($email, -8) != "@mit.edu") {
 $kerb = substr($email, 0, -8);
 
 /// Authenticate Discord member (make sure they came from clicking the link, and therefore own the account)
-if (!isset($_GET['id'])) {
+if (!isset($_REQUEST['id'])) {
 	die('Internal error: You didn\'t specify a Discord account to verify!');
 }
-$member = intval($_GET['id']);
+$member = intval($_REQUEST['id']);
 $toHash = PEPPER.":$member";
 $hash = hash('sha256', $toHash);
-if (!isset($_GET['auth'])) {
+if (!isset($_REQUEST['auth'])) {
 	die('Internal error: No auth!');
 }
-$expectedHash = $_GET['auth'];
+$expectedHash = $_REQUEST['auth'];
 if ($hash !== $expectedHash) {
 	die('Internal error: Could not verify that you own the Discord account you\'re trying to verify!');
 }
