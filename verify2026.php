@@ -1,21 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Discord verification</title>
-<link rel="preconnect" href="https://fonts.gstatic.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="verify.css">
-</head>
-
-<body>
-<div id="main">
 <?php
 
 /// Debug
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
+
+/// Code to make POST requests, used for OpenID/OAuth
+/// Reference: https://www.php.net/manual/en/context.http.php
+function post($url, $args) {
+	$postdata = http_build_query($args);
+	$opts = array('http' => array(
+        'method' => 'POST',
+        'header' => 'Content-type: application/x-www-form-urlencoded',
+        'content' => $postdata
+    ));
+	$context = stream_context_create($opts);
+	return file_get_contents($url, false, $context);
+}
 
 /// Constants
 require "constants.php";
@@ -27,6 +28,62 @@ $connection = mysqli_connect(SQL_HOST, SQL_USERNAME, SQL_PASSWORD, SQL_DB);
 require_once "support/sdk_discord.php";
 $discord = new DiscordSDK();
 $discord->SetAccessInfo("Bot", TOKEN);
+
+/// Get user email
+if (isset($_SERVER['SSL_CLIENT_S_DN_Email'])) {
+    /// Pure cert authentication (preferred)
+    $email = $_SERVER['SSL_CLIENT_S_DN_Email'];
+
+} else if (isset($_GET['code'])) {
+    /// OAuth authentication
+    $tokenstuff = post('https://oidc.mit.edu/token', array(
+        'grant_type' => 'authorization_code',
+        'code' => $_GET['code'],
+        'redirect_uri' => 'https://discord2025.mit.edu/verify2026.php',
+        'client_id' => OAUTH_ID,
+        'client_secret' => OAUTH_SECRET
+    ));
+    if (!$tokenstuff) {
+        /// If unable to get a token, try again
+        header("Location: https://discord2025.mit.edu/verify2026.php");
+    }
+    $tokenstuff = json_decode($tokenstuff, true);
+    $token = $tokenstuff['access_token'];
+    // https://openid.net/specs/openid-connect-basic-1_0.html#UserInfoRequest
+    $userinfo = post('https://oidc.mit.edu/userinfo', array(
+        'access_token' => $token
+    ));
+    $userinfo = json_decode($userinfo, true);
+    $email = $userinfo['email'];
+
+} else {
+    /// If cert doesn't work, fallback to OAuth
+    header("Location: https://oidc.mit.edu/authorize?client_id=".OAUTH_ID."&response_type=code&redirect_uri=https://discord2025.mit.edu/verify2026.php");
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Discord verification</title>
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans&amp;display=swap" rel="stylesheet">
+<!-- Credit to jt for the styling -->
+<link rel="stylesheet" href="verify.css">
+</head>
+
+<body>
+<div id="main">
+
+<?php
+
+/// Extract kerb from email
+$email = strtolower($email);
+if (substr($email, -8) != "@mit.edu") {
+    die("Given email is $email, which is not an MIT email!");
+} 
+$kerb = substr($email, 0, -8);
 
 /// Authenticate Discord member (make sure they came from clicking the link, and therefore own the account)
 if (!isset($_GET['id'])) {
@@ -43,21 +100,7 @@ if ($hash !== $expectedHash) {
 	die('Internal error: Could not verify that you own the Discord account you\'re trying to verify!');
 }
 
-/// Check for valid certificate
-if (!isset($_SERVER['SSL_CLIENT_S_DN_Email'])) {
-    // TODO: Do OAuth if no certificate
-	die('No certificate given! See <a href="https://ist.mit.edu/certificates">https://ist.mit.edu/certificates</a> for instructions, then come back here when you have your certificate.');
-} else {
-
-    $email = $_SERVER['SSL_CLIENT_S_DN_Email'];
-
-    if (substr($email, -8) != "@MIT.EDU") {
-        die("Not an MIT certificate! Given email is $email");
-    }
-
-    /// Extract kerb
-    $kerb = substr($email, 0, -8);
-}
+/// HERE BEGINS 2026-SPECIFIC CODE (i.e. references to '26 table) ///
 
 /// Check for duplicates
 $numDiscordsByKerb = mysqli_num_rows(mysqli_query($connection, "SELECT discord FROM kerbs26 where kerb=\"$kerb\""));
