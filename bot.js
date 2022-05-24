@@ -62,7 +62,7 @@ client.on('guildMemberAdd', member => {
     if (member.guild.id == config.guild_2025) {
         member.send(`Hi! I'm Tim. In order to get verified as a member of the class of 2025, please click on the following link:
 
-${getVerifyLink(member.id)}
+${getVerifyLink(member.id, 2025)}
 
 Once you're in the server, please check out #rules-n-how-to-discord, get roles in #roles, and don't forget to introduce yourself to your fellow adMITs in #introductions!`);
     }
