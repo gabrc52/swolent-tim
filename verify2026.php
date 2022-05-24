@@ -58,7 +58,9 @@ if (isset($_SERVER['SSL_CLIENT_S_DN_Email'])) {
 
 } else {
     /// If cert doesn't work, fallback to OAuth
-    header("Location: https://oidc.mit.edu/authorize?client_id=".OAUTH_ID."&response_type=code&redirect_uri=https://discord2025.mit.edu$_SERVER[REQUEST_URI]");
+    $redirectUrl = "https://discord2025.mit.edu$_SERVER[REQUEST_URI]";
+    $encodedRedirectUrl = urlencode($redirectUrl);
+    header("Location: https://oidc.mit.edu/authorize?client_id=".OAUTH_ID."&response_type=code&redirect_uri=".$encodedRedirectUrl);
 }
 ?>
 
