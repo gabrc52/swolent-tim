@@ -72,7 +72,7 @@ Once you're in the server, please check out #rules-n-how-to-discord, get roles i
 
 ${getVerifyLink(member.id, '')}
 
-(having certs installed is preferred)`);
+NOTE: Having certs installed is preferred but if you don't, you should still be able to verify (might take a few seconds)`);
     }
 });
 
