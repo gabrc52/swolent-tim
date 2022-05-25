@@ -66,6 +66,14 @@ ${getVerifyLink(member.id, 2025)}
 
 Once you're in the server, please check out #rules-n-how-to-discord, get roles in #roles, and don't forget to introduce yourself to your fellow adMITs in #introductions!`);
     }
+
+    if (member.guild.id == config.guild_intl) {
+        member.send(`Hi! I'm Tim. To get access to the MIT Internationals server, please click on the following link:
+
+${getVerifyLink(member.id, '')}
+
+(having certs installed is preferred)`);
+    }
 });
 
 const token_thunks = [
