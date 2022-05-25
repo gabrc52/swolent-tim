@@ -149,7 +149,12 @@ const setup = (client, config) => {
     });
     client.on('messageReactionAdd', (reaction, user) => {
         if (reaction.emoji.name === 'verifyme') {
-            sendVerificationDm(user);
+            if (reaction.message.guild.id == config.guild_2025) {
+                sendVerificationDm(user, 2025);
+            } else if (reaction.message.guild.id == config.guild_intl) {
+                sendVerificationDm(user, '');
+            }
+            
         }
     });
     // Commands
