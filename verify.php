@@ -28,7 +28,7 @@ if (!isset($_SERVER['SSL_CLIENT_S_DN_Email']) && (isset($_GET['id']) || isset($_
     if (isset($_GET['auth'])) {
         setcookie('auth', $_GET['auth']);
     }
-    header("Location: https://discord2025.mit.edu/verify2026.php");   
+    header("Location: https://discord2025.mit.edu/verify.php");   
 }
 
 
