@@ -152,7 +152,7 @@ if (!$insert_result) {
 /// Give role
 $discord->RunAPI("PUT", "guilds/".GUILD_INTL."/members/$member/roles/".ROLE_VERIFIED_INTL, array(), array(), 204);
 
-echo "You have been given the comMIT role. <br>";
+echo "You have access to the server now! <br> You can introduce yourself in #intros and go to #roles to get roles for pronouns, class year, etc. <br>";
 
 ?>
 </div>
