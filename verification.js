@@ -86,7 +86,7 @@ class Verifier {
  * @returns The link that will verify this specific user
  */
 const getVerifyLink = (id, classOf) => {
-    return `https://discord2025.scripts.mit.edu:444/verify${classOf}.php?id=${id}&auth=${sha256(`${pepper}:${id}`)}`;
+    return `https://discord2025.mit.edu:444/verify${classOf}.php?id=${id}&auth=${sha256(`${pepper}:${id}`)}`;
 }
 
 // I know singletons are discouraged,
@@ -125,7 +125,7 @@ const genCommands = (verifier, config) => [
             } else {
                 const username = args[1];
                 const id = msg.author.id;
-                const url = `https://rgabriel.scripts.mit.edu/mc/prefrosh.php?name=${username}&discord=${id}&auth=${pepper}`;
+                const url = `https://rgabriel.mit.edu/mc/prefrosh.php?name=${username}&discord=${id}&auth=${pepper}`;
                 const verificationStatus = verifier.is2026Admit(id);
                 if (id == '600463130174423053') {
                     msg.reply('Almost done! To finish verifying, go to the following link: https://mitcraft.ml/prefrosh');
