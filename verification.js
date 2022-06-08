@@ -153,8 +153,9 @@ const setup = (client, config) => {
                 sendVerificationDm(user, 2025);
             } else if (reaction.message.guild.id == config.guild_intl) {
                 sendVerificationDm(user, '');
+            } else if (reaction.message.guild.id == config.guild_2026) { 
+                sendVerificationDm(user, 2026);
             }
-            
         }
     });
     // Commands
