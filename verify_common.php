@@ -7,6 +7,7 @@ if (!defined('INSTANCE')) {
 /// Redirect discord2025.scripts.mit.edu to discord2025.mit.edu:444
 if (strpos($_SERVER['SERVER_NAME'], 'scripts') !== false) {
     header("Location: https://discord2025.mit.edu:444$_SERVER[REQUEST_URI]");
+    die();
 }
 
 /// Debug
@@ -28,6 +29,7 @@ if (!isset($_SERVER['SSL_CLIENT_S_DN_Email']) && (isset($_GET['id']) || isset($_
     /// If authenticating using oidc, don't use 444 port so it matches the oauth redirect URL
     if ($_SERVER['SERVER_PORT'] == 444) {
         header("Location: https://discord2025.mit.edu$_SERVER[REQUEST_URI]");
+        die();
     }
     /// I'm checking for cert here so using cert authentication doesn't require having cookies enabled
     if (isset($_GET['id'])) {
@@ -36,7 +38,8 @@ if (!isset($_SERVER['SSL_CLIENT_S_DN_Email']) && (isset($_GET['id']) || isset($_
     if (isset($_GET['auth'])) {
         setcookie('auth', $_GET['auth']);
     }
-    header("Location: https://discord2025.mit.edu/".INSTANCE.".php");   
+    header("Location: https://discord2025.mit.edu/".INSTANCE.".php");
+    die();
 }
 
 
@@ -81,6 +84,7 @@ if (isset($_SERVER['SSL_CLIENT_S_DN_Email'])) {
     if (!$tokenstuff) {
         /// If unable to get a token, try again
         header("Location: https://discord2025.mit.edu/".INSTANCE.".php");
+        die();
     }
     $tokenstuff = json_decode($tokenstuff, true);
     $token = $tokenstuff['access_token'];
@@ -94,6 +98,7 @@ if (isset($_SERVER['SSL_CLIENT_S_DN_Email'])) {
 } else {
     /// If cert doesn't work, fallback to OAuth
     header("Location: https://discord2025.mit.edu/redirect.php?instance=".INSTANCE);
+    die();
 }
 ?>
 
