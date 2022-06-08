@@ -4,8 +4,8 @@ if (!defined('INSTANCE')) {
     die("Developer error: INSTANCE is not set! If you see this, report to gabrielr#9134. Or maybe you directly tried to directly call a file that shouldn't be.");
 }
 
-/// Redirect discord2025.scripts.mit.edu to discord2025.mit.edu:444
-if (strpos($_SERVER['SERVER_NAME'], 'scripts') !== false) {
+/// Redirect discord2025.scripts.mit.edu or discord2025.mit.edu to discord2025.mit.edu:444
+if (strpos($_SERVER['SERVER_NAME'], 'scripts') !== false || $_SERVER['SERVER_PORT'] != 444) {
     header("Location: https://discord2025.mit.edu:444$_SERVER[REQUEST_URI]");
 }
 
