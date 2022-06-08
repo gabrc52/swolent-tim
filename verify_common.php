@@ -25,6 +25,10 @@ error_reporting(E_ALL);
 /// https://stackoverflow.com/questions/55524480/should-dynamic-query-parameters-be-present-in-the-redirection-uri-for-an-oauth2
 
 if (!isset($_SERVER['SSL_CLIENT_S_DN_Email']) && (isset($_GET['id']) || isset($_GET['auth']))) {
+    /// If authenticating using oidc, don't use 444 port so it matches the oauth redirect URL
+    if ($_SERVER['SERVER_PORT'] == 444) {
+        header("Location: https://discord2025.mit.edu$_SERVER[REQUEST_URI]");
+    }
     /// I'm checking for cert here so using cert authentication doesn't require having cookies enabled
     if (isset($_GET['id'])) {
         setcookie('id', $_GET['id']);
