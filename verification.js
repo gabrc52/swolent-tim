@@ -60,14 +60,18 @@ class Verifier {
     }
 
     /// For automatic verification based on your roles in 2025/2026 server
-    verify(guildMember) {
+    /// Returns a boolean signaling if a verified role was successfully assigned
+    async verify(guildMember) {
         const guild = guildMember.guild;
         if (guild.id == this.config.guild_2025) {
             /// Give 2026 role to 2026s who join the 2025 server
-            const verification = this.is2026Commit(guildMember.id);
-            verification.then(() => {
+            try {
+                await this.is2026Commit(guildMember.id);
                 guildMember.roles.add(this.config.role_for_2026s_in_2025_server);
-            });
+                return true;
+            } catch (e) {
+                return false;
+            }            
         } else {
             /// Give verified role to 2025s who join 2025-affiliated servers
             const { channel, role } = this.get_cached(guild);
@@ -75,16 +79,19 @@ class Verifier {
             if (!channel) {
                 return;
             }
-            const verification = this.isCommit(guildMember.id);
-            verification.then(() => {
+            try {
+                await this.isCommit(guildMember.id);
                 if (role) {
                     guildMember.roles.add(role);
+                    return true;
                 } else {
                     channel.send(`Could not find verified role in ${guild.name}`);
+                    return false;
                 }
-            }).catch(error => {
+            } catch (error) {
                 channel.send(`${guildMember}: ${error}`);
-            });
+                return false;
+            }
         }
     }
 }
@@ -166,8 +173,13 @@ const setup = (client, config) => {
         throw new Error("Verifier already setup!");
     }
     verifier = new Verifier(client, config);
-    client.on('guildMemberAdd', member => {
-        verifier.verify(member);
+    client.on('guildMemberAdd', async member => {
+        const roleSuccess = await verifier.verify(member);
+
+        /// don't make 2026s get a DM asking them to verify as 2025s
+        if (roleSuccess) {
+            return;
+        }
 
         if (member.guild.id == config.guild_2025) {
             member.send(`Hi! I'm Tim. In order to get verified as a member of the class of 2025, please click on the following link:
