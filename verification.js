@@ -166,8 +166,8 @@ const setup = (client, config) => {
         throw new Error("Verifier already setup!");
     }
     verifier = new Verifier(client, config);
-    client.on('guildMemberAdd', guildMember => {
-        verifier.verify(guildMember);
+    client.on('guildMemberAdd', member => {
+        verifier.verify(member);
 
         if (member.guild.id == config.guild_2025) {
             member.send(`Hi! I'm Tim. In order to get verified as a member of the class of 2025, please click on the following link:
