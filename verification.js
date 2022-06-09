@@ -59,23 +59,33 @@ class Verifier {
         return cached;
     }
 
+    /// For automatic verification based on your roles in 2025/2026 server
     verify(guildMember) {
         const guild = guildMember.guild;
-        const { channel, role } = this.get_cached(guild);
-        /// Don't try to verify if #landing-pad doesn't exist
-        if (!channel) {
-            return;
-        }
-        const verification = this.isCommit(guildMember.id);
-        verification.then(() => {
-            if (role) {
-                guildMember.roles.add(role);
-            } else {
-                channel.send(`Could not find verified role in ${guild.name}`);
+        if (guild.id == this.config.guild_2025) {
+            /// Give 2026 role to 2026s who join the 2025 server
+            const verification = this.is2026Commit(guildMember.id);
+            verification.then(() => {
+                guildMember.roles.add(this.config.role_for_2026s_in_2025_server);
+            });
+        } else {
+            /// Give verified role to 2025s who join 2025-affiliated servers
+            const { channel, role } = this.get_cached(guild);
+            /// Don't try to verify if #landing-pad doesn't exist
+            if (!channel) {
+                return;
             }
-        }).catch(error => {
-            channel.send(`${guildMember}: ${error}`);
-        });
+            const verification = this.isCommit(guildMember.id);
+            verification.then(() => {
+                if (role) {
+                    guildMember.roles.add(role);
+                } else {
+                    channel.send(`Could not find verified role in ${guild.name}`);
+                }
+            }).catch(error => {
+                channel.send(`${guildMember}: ${error}`);
+            });
+        }
     }
 }
 
@@ -114,7 +124,18 @@ const genCommands = (verifier, config) => [
         name: 'verify26',
         unprefixed: true,
         call: msg => {
-            sendVerificationDm(msg.author, 2026);
+            if (msg.guild.id == config.guild_2025) {
+                const verification = verifier.is2026Commit(guildMember.id);
+                verification
+                    .then(() => {
+                        guildMember.roles.add(config.role_for_2026s_in_2025_server);
+                    })
+                    .catch(error => {
+                        msg.reply('To get verified here, get verified in the 2026 server first.')
+                    });
+            } else {
+                sendVerificationDm(msg.author, 2026);
+            }
         }
     }, {
         name: 'whitelist',
@@ -131,8 +152,8 @@ const genCommands = (verifier, config) => [
                     msg.reply('Almost done! To finish verifying, go to the following link: https://mitcraft.ml/prefrosh');
                 } else {
                     verificationStatus
-                    .then(() => got(url).then(response => msg.channel.send(`${response.body}`)))
-                    .catch(error => msg.reply(`${error} If you're not a prefrosh, go to https://mitcraft.ml to get whitelisted. Go to #help if you're having trouble.`));
+                        .then(() => got(url).then(response => msg.channel.send(`${response.body}`)))
+                        .catch(error => msg.reply(`${error} If you're not a prefrosh, go to https://mitcraft.ml to get whitelisted. Go to #help if you're having trouble.`));
                 }
             }
         }
@@ -153,7 +174,7 @@ const setup = (client, config) => {
                 sendVerificationDm(user, 2025);
             } else if (reaction.message.guild.id == config.guild_intl) {
                 sendVerificationDm(user, '');
-            } else if (reaction.message.guild.id == config.guild_2026) { 
+            } else if (reaction.message.guild.id == config.guild_2026) {
                 sendVerificationDm(user, 2026);
             }
         }
