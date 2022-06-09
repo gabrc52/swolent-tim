@@ -18,7 +18,8 @@ module.exports = {
         // MIT 2025 verified role
         admitted_role: '789507257124913192',
         verified_role: '841458449014587422',
-        admitted_role_2026: '918241449412280371'
+        admitted_role_2026: '918241449412280371',
+        verified_role_2026: '918405414624829470'
     },
     confessions_channel: '819127555911188541',
     boomer_confessions_channel: '836071068175171606',

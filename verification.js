@@ -33,15 +33,15 @@ class Verifier {
 
     // TODO: Essentially copy-paste function. Maybe make it not reuse code so much?
     /**
-     * Check if Discord user is verified as admitted to the member of the class of 2026.
+     * Check if Discord user is verified as commited to the member of the class of 2026.
      * @param {string} id the id of the person to check 
      */
-    async is2026Admit(id) {
+    async is2026Commit(id) {
         const guildMember = this.guild_2026.members.cache.get(id);
         if (!guildMember) {
             throw "You're not in the MIT 2026 server."
         } else {
-            const role = guildMember.roles.cache.get(this.config.admitted_role_2026);
+            const role = guildMember.roles.cache.get(this.config.verified_role_2026);
             if (!role) {
                 throw "Swole Tim hasn't verified you in the MIT 2026 server. Please follow the instructions to verify there."
             }
@@ -126,7 +126,7 @@ const genCommands = (verifier, config) => [
                 const username = args[1];
                 const id = msg.author.id;
                 const url = `https://rgabriel.mit.edu/mc/prefrosh.php?name=${username}&discord=${id}&auth=${pepper}`;
-                const verificationStatus = verifier.is2026Admit(id);
+                const verificationStatus = verifier.is2026Commit(id);
                 if (id == '600463130174423053') {
                     msg.reply('Almost done! To finish verifying, go to the following link: https://mitcraft.ml/prefrosh');
                 } else {
