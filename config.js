@@ -19,7 +19,8 @@ module.exports = {
         admitted_role: '789507257124913192',
         verified_role: '841458449014587422',
         admitted_role_2026: '918241449412280371',
-        verified_role_2026: '918405414624829470'
+        verified_role_2026: '918405414624829470',
+        role_for_2026s_in_2025_server: '984549989785153607'
     },
     confessions_channel: '819127555911188541',
     boomer_confessions_channel: '836071068175171606',
