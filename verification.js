@@ -125,13 +125,14 @@ const genCommands = (verifier, config) => [
         unprefixed: true,
         call: msg => {
             if (msg.guild.id == config.guild_2025) {
-                const verification = verifier.is2026Commit(guildMember.id);
+                const verification = verifier.is2026Commit(msg.author.id);
                 verification
                     .then(() => {
+                        const guildMember = msg.guild.members.cache.get(id);
                         guildMember.roles.add(config.role_for_2026s_in_2025_server);
                     })
                     .catch(error => {
-                        msg.reply('To get verified here, get verified in the 2026 server first.')
+                        msg.reply('To get verified as a 2026 here, get verified in the 2026 server first.')
                     });
             } else {
                 sendVerificationDm(msg.author, 2026);
