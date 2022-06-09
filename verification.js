@@ -132,7 +132,7 @@ const genCommands = (verifier, config) => [
                         guildMember.roles.add(config.role_for_2026s_in_2025_server);
                     })
                     .catch(error => {
-                        msg.reply('To get verified as a 2026 here, get verified in the 2026 server first.')
+                        msg.reply(`${error}`);
                     });
             } else {
                 sendVerificationDm(msg.author, 2026);
