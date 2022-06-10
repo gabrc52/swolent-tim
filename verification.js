@@ -68,7 +68,7 @@ class Verifier {
             /// Give 2026 role to 2026s who join the 2025 server
             try {
                 await this.is2026Commit(guildMember.id);
-                const role_2026 = guild.roles.resolve(config.role_for_2026s_in_2025_server);
+                const role_2026 = guild.roles.resolve(this.config.role_for_2026s_in_2025_server);
                 guildMember.roles.add(role_2026);
                 return true;
             } catch (e) {
