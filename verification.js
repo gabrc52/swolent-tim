@@ -136,7 +136,8 @@ const genCommands = (verifier, config) => [
                 verification
                     .then(() => {
                         const guildMember = msg.guild.members.cache.get(msg.author.id);
-                        guildMember.roles.add(config.role_for_2026s_in_2025_server);
+                        const role_2026 = msg.guild.roles.resolve(config.role_for_2026s_in_2025_server);
+                        guildMember.roles.add(role_2026);
                     })
                     .catch(error => {
                         msg.reply(`${error}`);
