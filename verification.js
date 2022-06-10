@@ -6,6 +6,7 @@ class Verifier {
     constructor(client, config) {
         this.base_guild = client.guilds.cache.get(config.guild_2025);
         this.guild_2026 = client.guilds.cache.get(config.guild_2026);
+        /// WARNING: this isn't the full config, just a subset, so if you try to call other parts, it will silently fail
         this.config = config.verification;
         this.verify_cache = {};
 
@@ -63,7 +64,7 @@ class Verifier {
     /// Returns a boolean signaling if a verified role was successfully assigned
     async verify(guildMember) {
         const guild = guildMember.guild;
-        if (guild.id == this.config.guild_2025) {
+        if (guild == this.base_guild) {
             /// Give 2026 role to 2026s who join the 2025 server
             try {
                 await this.is2026Commit(guildMember.id);
@@ -71,6 +72,7 @@ class Verifier {
                 guildMember.roles.add(role_2026);
                 return true;
             } catch (e) {
+                console.log(e);
                 return false;
             }            
         } else {
