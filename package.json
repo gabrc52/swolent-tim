@@ -22,7 +22,9 @@
     "got": "^11.8.2",
     "js-sha256": "^0.9.0",
     "shamirs-secret-sharing-ts": "^1.0.2",
-    "shuffle-array": "^1.0.1"
+    "shuffle-array": "^1.0.1",
+    "tsc": "^2.0.4",
+    "typescript": "^4.7.4"
   },
   "devDependencies": {
     "@types/got": "^9.6.12",
