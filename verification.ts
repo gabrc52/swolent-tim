@@ -3,6 +3,7 @@ import pepper = require('./pepper');
 import { sha256 } from "js-sha256";
 
 import type { Client, Guild, GuildMember, Message, MessageReaction, Role, Snowflake, TextChannel, User, PartialUser } from "discord.js";
+import * as fs from 'fs';
 
 interface VerifySetup {
     guild_2025: Snowflake,
@@ -40,6 +41,45 @@ export class Verifier {
         if (!this.base_guild) {
             throw new Error(`Could not find base guild (id ${config.guild_2025})!`);
         }
+    }
+
+    /**
+     * Gets the list of servers that have kerb verification enabled (i.e. any kerb)
+     */
+    async getKerbVerificationServers() : Promise<string[]> {
+        const json : string = fs.readFileSync('servers.json', 'utf8');
+        const dict : object = JSON.parse(json);
+        const servers : string[] = [];
+        for (const [server, enabled] of Object.entries(dict)) {
+            if (enabled) {
+                servers.push(server);
+            }
+        }
+        return servers;
+    }
+
+    async setKerbVerificationEnabled(serverId: string, enabled: boolean) {
+        let json : string = fs.readFileSync('servers.json', 'utf8');
+        const dict : any = JSON.parse(json); // TODO: use stronger type annotation
+        dict[serverId] = enabled;
+        json = JSON.stringify(dict);
+        fs.writeFileSync('servers.json', json);
+    }
+
+    /**
+     * Enables kerb verification for server `serverId`
+     * @param serverId discord id of the server
+     */
+    async enableKerbVerification(serverId: string) {
+        await this.setKerbVerificationEnabled(serverId, true);
+    }
+
+    /**
+     * Disables kerb verification for server `serverId`
+     * @param serverId discord id of the server
+     */
+     async disableKerbVerification(serverId: string) {
+        await this.setKerbVerificationEnabled(serverId, false);
     }
 
     /**
@@ -130,8 +170,12 @@ export class Verifier {
  * @param {*} classOf Class of the person verifying (2025 or 2026)
  * @returns The link that will verify this specific user
  */
-export const getVerifyLink = (id: string, classOf: string) => {
+export const getClassVerifyLink = (id: string, classOf: string) => {
     return `https://discord2025.mit.edu:444/verify${classOf}.php?id=${id}&auth=${sha256(`${pepper}:${id}`)}`;
+}
+
+export const getVerifyLink = (id: string, serverId: string) => {
+    return `https://discord2025.mit.edu:444/verify.php?id=${id}&server=${serverId}&auth=${sha256(`${pepper}:${id}`)}`;
 }
 
 // I know singletons are discouraged,
@@ -139,9 +183,13 @@ export const getVerifyLink = (id: string, classOf: string) => {
 // It's cleaner than passing around one per client, at any rate
 let verifier: Verifier | null = null;
 
-const sendVerificationDm = (user: User | PartialUser, classOf: string) => {
-    user.send(`To verify that you're a comMIT please click on the following link: ${getVerifyLink(user.id, classOf)}`);
+const sendClassVerificationDm = (user: User | PartialUser, classOf: string) => {
+    user.send(`To verify that you're a comMIT please click on the following link: ${getClassVerifyLink(user.id, classOf)}`);
 };
+
+const sendVerificationDm = (user: User | PartialUser, serverId: string) => {
+    user.send(`To get access to the server please click on the following link: ${getVerifyLink(user.id, serverId)}`);
+}
 
 const genCommands = (verifier: Verifier, config: VerifySetup) => [
     {
@@ -149,7 +197,7 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
         call: (msg: Message) => {
             const id = msg.author.id;
             if (msg.channel.type === 'dm' || msg.guild?.id == config.guild_2025) {
-                sendVerificationDm(msg.author, '2025');
+                sendClassVerificationDm(msg.author, '2025');
             } else {
                 const guildMember = msg.guild?.members.cache.get(id);
                 if (guildMember) {
@@ -177,6 +225,31 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
                 }
             }
         }
+    }, {
+        name: 'enableVerification',
+        call: async (msg: Message) => {
+            /// TODO: ensure admin or mod
+            if (msg.guild != null) {
+                const id : string = msg.guild.id;
+                await verifier.enableKerbVerification(id);
+                msg.reply(`Verification has been enabled for ${msg.guild.name}`);
+            }
+        },
+    }, {
+        name: 'disableVerification',
+        call: async (msg: Message) => {
+            if (msg.guild != null) {
+                const id : string = msg.guild.id;
+                await verifier.disableKerbVerification(id);
+                msg.reply(`Verification has been disabled for ${msg.guild.name}`); 
+            }
+        }
+    }, {
+        name: 'getVerificationServers',
+        call: async (msg: Message) => {
+            const servers : string[] = await verifier.getKerbVerificationServers();
+            msg.reply(servers.toString());
+        }
     }
 ];
 
@@ -196,26 +269,27 @@ const setup = (client: Client, config: any) => {
         if (member.guild.id == config.guild_2025) {
             member.send(`Hi! I'm Tim. In order to get verified as a member of the class of 2025, please click on the following link:
     
-${getVerifyLink(member.id, '2025')}
+${getClassVerifyLink(member.id, '2025')}
     
 Once you're in the server, please check out #rules-n-how-to-discord, get roles in #roles, and don't forget to introduce yourself to your fellow adMITs in #introductions!`);
         }
     
-        if (member.guild.id == config.guild_intl) {
-            member.send(`Hi! I'm Tim. To get access to the MIT Internationals server, please click on the following link:
+        const kerbVerificationServers = await verifier!.getKerbVerificationServers();
+        if (kerbVerificationServers.includes(member.guild.id)) {
+            member.send(`Hi! I'm Tim. To get access to "${member.guild.name}", please click on the following link:
     
-${getVerifyLink(member.id, '')}`);
+${getVerifyLink(member.id, member.guild.id)}`);
         }
     });
     client.on('messageReactionAdd', (reaction: MessageReaction, user: User | PartialUser) => {
         if (reaction.emoji.name === 'verifyme') {
             const rxn_id = reaction.message.guild?.id;
             if (rxn_id == config.guild_2025) {
-                sendVerificationDm(user, '2025');
-            } else if (rxn_id == config.guild_intl) {
-                sendVerificationDm(user, '');
+                sendClassVerificationDm(user, '2025');
             } else if (rxn_id == config.guild_2026) {
-                sendVerificationDm(user, '2026');
+                sendClassVerificationDm(user, '2026');
+            } else if (reaction.message.guild != null) {
+                sendVerificationDm(user, reaction.message.guild.id);
             }
         }
     });
@@ -225,5 +299,5 @@ ${getVerifyLink(member.id, '')}`);
 module.exports = {
     setup,
     Verifier,
-    getVerifyLink,
+    getVerifyLink: getClassVerifyLink,
 };
