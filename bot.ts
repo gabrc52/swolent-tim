@@ -1,7 +1,7 @@
 import { Client } from 'discord.js';
 import config = require('./config');
 import * as breakout from './breakout';
-import { getVerifyLink } from './verification';
+import { getClassVerifyLink } from './verification';
 import { readFileSync } from 'fs';
 
 import type { Message, Snowflake, TextChannel } from 'discord.js';

@@ -9,7 +9,6 @@ export = {
     },
     guild_2025: '783435629186252820',
     guild_2026: '910627532322267166',
-    guild_intl: '978798894710419527',
     verification: {
         // Channel to call people out as unverified in
         target_channel: 'landing-pad',

@@ -6,9 +6,11 @@ define('INSTANCE', 'verify');
 
 include 'verify_common.php';
 
+$server = $_GET['server'];
+
 /// Check for duplicates
-$numDiscordsByKerb = mysqli_num_rows(mysqli_query($connection, "SELECT discord FROM kerbsintl where kerb=\"$kerb\""));
-$numKerbsByDiscord = mysqli_num_rows(mysqli_query($connection, "SELECT kerb FROM kerbsintl where discord=\"$member\""));
+$numDiscordsByKerb = mysqli_num_rows(mysqli_query($connection, "SELECT discord FROM kerbs where kerb=\"$kerb\""));
+$numKerbsByDiscord = mysqli_num_rows(mysqli_query($connection, "SELECT kerb FROM kerbs where discord=\"$member\""));
 if ($numKerbsByDiscord > 0) {
     // Let people rejoin after leaving
     //die("You have already verified this Discord account, no need to do it again! If you need help, please contact staff by DM or 2025discordadmin@mit.edu.");
@@ -19,7 +21,7 @@ if ($numKerbsByDiscord > 0) {
 /// Save into database
 
 $now = time();
-$insert_query = "INSERT INTO kerbsintl (kerb, discord, timestamp) VALUES (\"$kerb\", $member, $now)";
+$insert_query = "INSERT INTO kerbs (kerb, discord, timestamp, server) VALUES (\"$kerb\", $member, $now, $server)";
 $insert_result = mysqli_query($connection, $insert_query);
 
 if (!$insert_result) {
@@ -27,7 +29,8 @@ if (!$insert_result) {
 }
 
 /// Give role
-$discord->RunAPI("PUT", "guilds/".GUILD_INTL."/members/$member/roles/".ROLE_VERIFIED_INTL, array(), array(), 204);
+/// TODO: change verified role!
+$discord->RunAPI("PUT", "guilds/$server/members/$member/roles/".ROLE_VERIFIED_INTL, array(), array(), 204);
 
 echo "You have access to the server now! <br> You can introduce yourself in #intros and go to #roles to get roles for pronouns, class year, etc. <br>";
 
