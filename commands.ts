@@ -90,9 +90,9 @@ const setup = (client: Client, config: CommandSetup) => [
                         throw error;
                     }
                     await msg.reply(`${stdout}\n${stderr}`);
-                    exec('tsc', async (error, stdout, stderr) => {
+                    exec('npx tsc', async (error, stdout, stderr) => {
                         if (error) {
-                            throw error;
+                            await msg.reply(`${error}`);
                         }
                         await msg.reply(`${stdout}\n${stderr}`);
                         await msg.reply('Restarting, please wait a minute...');
