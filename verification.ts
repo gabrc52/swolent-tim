@@ -26,6 +26,18 @@ interface CacheEntry {
     role: Role,
 }
 
+/**
+ * there are 3 verification types:
+ *   - 2025/26 verification: they will send you to `verify2025.php` or `verify2026.php`, for '25/'26 server
+ *   - 2025-affiliated servers verification: automatically give verified role to people in other '25 servers
+ *   - general kerb verification: for any other MIT server. will currently give verified role to anyone with a kerb
+ *       the idea is to add moira list verification so more groups can use it
+ *       because for now otherwise there would be little point because busy beavers et al now just verify people who are in the discord student hub
+ */
+
+// TODO: maybe separate the code into different classes? like the main class would be `Verifier` 
+// but the code could be in 3 other classes
+// And also, some of the code is in `bot.ts`, so uh, yeah.
 export class Verifier {
     base_guild: Guild;
     guild_2026: Guild;
@@ -58,7 +70,7 @@ export class Verifier {
         return servers;
     }
 
-    async setKerbVerificationConfig(serverId: string, key: 'enabled' | 'role' | 'moira', value: any) {
+    async setKerbVerificationConfig(serverId: string, key: 'enabled' | 'role' | 'moira' | 'message', value: any) {
         let json: string = fs.readFileSync('servers.json', 'utf8');
         const dict: any = JSON.parse(json); // TODO: use stronger type annotation
         if (dict[serverId] === undefined) {
@@ -92,6 +104,15 @@ export class Verifier {
      */
     async setKerbVerificationRole(serverId: string, roleId: string) {
         await this.setKerbVerificationConfig(serverId, 'role', roleId);
+    }
+
+    /**
+     * Set message to reply to recently verified user for server
+     * @param serverId discord id of the server
+     * @param message message
+     */
+    async setKerbVerificationSuccessMessage(serverId: string, message: string) {
+        await this.setKerbVerificationConfig(serverId, 'message', message);
     }
 
     /** 
