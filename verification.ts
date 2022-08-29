@@ -281,7 +281,9 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
                     await verifier.enableKerbVerification(id);
                     const { role } = verifier.get_cached(msg.guild);
                     if (role === undefined) {
-                        msg.reply('Please create a role called "verified" to give to people once they verify, or set a verified role using `tim.setVerificationRole ROLE_ID_GOES_HERE`');
+                        msg.reply(`Please either:
+* create a role called "verified" to give to people once they verify, and then run \`tim.enableVerification\` again afterward
+* or set a verified role using \`tim.setVerificationRole ROLE_ID_GOES_HERE\``);
                     } else {
                         await verifier.setKerbVerificationRole(id, role.id);
                         msg.reply(`Verification has been enabled for ${msg.guild.name}`);
@@ -316,7 +318,7 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
                     msg.reply("Please specify a role id for the verified role id.")
                 } else {
                     await verifier.setKerbVerificationRole(msg.guild.id, args[1]);
-                    msg.reply(`Verified role successfully set to <@${args[1]}>!`)
+                    msg.reply(`Verified role successfully set to <@&${args[1]}>!`)
                 }
             }
         }
