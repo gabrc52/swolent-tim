@@ -2,7 +2,7 @@ import got from 'got';
 import pepper = require('./pepper');
 import { sha256 } from "js-sha256";
 
-import type { Client, Guild, GuildMember, Message, MessageReaction, Role, Snowflake, TextChannel, User, PartialUser } from "discord.js";
+import { Client, Guild, GuildMember, Message, MessageReaction, Role, Snowflake, TextChannel, User, PartialUser } from "discord.js";
 import * as fs from 'fs';
 
 interface VerifySetup {
@@ -271,8 +271,11 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
     }, {
         name: 'enableVerification',
         call: async (msg: Message) => {
-            /// TODO: ensure admin or mod for all these commands
             if (msg.guild != null) {
+                if (!msg.member!.hasPermission('MANAGE_GUILD')) {
+                    msg.reply(`Permission denied. You need to be a mod of "${msg.guild.name}" to enable verification (i.e. have manage server permission).`);
+                    return;
+                }
                 try {
                     const id: string = msg.guild.id;
                     await verifier.enableKerbVerification(id);
@@ -292,6 +295,10 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
         name: 'disableVerification',
         call: async (msg: Message) => {
             if (msg.guild != null) {
+                if (!msg.member!.hasPermission('MANAGE_GUILD')) {
+                    msg.reply(`Permission denied. You need to be a mod of "${msg.guild.name}" to enable verification (i.e. have manage server permission).`);
+                    return;
+                }
                 const id: string = msg.guild.id;
                 await verifier.disableKerbVerification(id);
                 msg.reply(`Verification has been disabled for ${msg.guild.name}`);
@@ -301,22 +308,43 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
         name: 'setVerificationRole',
         call: async (msg: Message, args: string[]) => {
             if (msg.guild != null) {
+                if (!msg.member!.hasPermission('MANAGE_GUILD')) {
+                    msg.reply(`Permission denied. You need to be a mod of "${msg.guild.name}" to enable verification (i.e. have manage server permission).`);
+                    return;
+                }
                 if (!args[1]) {
                     msg.reply("Please specify a role id for the verified role id.")
                 } else {
-                    await verifier.setKerbVerificationRole(msg.guild.id, args[1])
+                    await verifier.setKerbVerificationRole(msg.guild.id, args[1]);
                 }
             }
         }
     }, {
+/// TODO: there is a lot of code repetition... fix this perhaps?
         name: 'setVerificationMoiraList',
         call: async (msg: Message, args: string[]) => {
             if (msg.guild != null) {
+                if (!msg.member!.hasPermission('MANAGE_GUILD')) {
+                    msg.reply(`Permission denied. You need to be a mod of "${msg.guild.name}" to enable verification (i.e. have manage server permission).`);
+                    return;
+                }
                 if (!args[1]) {
                     msg.reply("Please specify a moira list to check against.")
                 } else {
-                    await verifier.setKerbVerificationMoiraList(msg.guild.id, args[1])
+                    await verifier.setKerbVerificationMoiraList(msg.guild.id, args[1]);
                 }
+            }
+        }
+    }, {
+        name: 'setVerificationMessage',
+        call: async (msg: Message, args: string[]) => {
+            if (msg.guild != null) {
+                if (!msg.member!.hasPermission('MANAGE_GUILD')) {
+                    msg.reply(`Permission denied. You need to be a mod of "${msg.guild.name}" to enable verification (i.e. have manage server permission).`);
+                    return;
+                }
+                let text = msg.content.substr(args[0].length + 1).trim();
+                await verifier.setKerbVerificationMoiraList(msg.guild.id, text);
             }
         }
     }, {
