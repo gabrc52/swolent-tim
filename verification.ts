@@ -256,8 +256,12 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
                     const id: string = msg.guild.id;
                     await verifier.enableKerbVerification(id);
                     const { role } = verifier.get_cached(msg.guild);
-                    await verifier.setKerbVerificationRole(id, role.id);
-                    msg.reply(`Verification has been enabled for ${msg.guild.name}`);
+                    if (role === undefined) {
+                        msg.reply('Please create a role called "verified" to give to people once they verify');
+                    } else {
+                        await verifier.setKerbVerificationRole(id, role.id);
+                        msg.reply(`Verification has been enabled for ${msg.guild.name}`);
+                    }
                 } catch (e) {
                     msg.reply(`${e}`);
                 }
