@@ -348,7 +348,7 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
                     return;
                 }
                 let text = msg.content.substr(args[0].length + 1).trim();
-                await verifier.setKerbVerificationMoiraList(msg.guild.id, text);
+                await verifier.setKerbVerificationSuccessMessage(msg.guild.id, text);
                 msg.reply(`Message successfully set!`);
             }
         }
