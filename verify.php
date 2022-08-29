@@ -37,11 +37,11 @@ if (!$insert_result) {
 /// Give role
 $discord->RunAPI("PUT", "guilds/$server/members/$member/roles/$role", array(), array(), 204);
 
-if (!$serverconf[$server]['message']) {
-    echo "You have access to the server now! Welcome!";
-} else {
+if (isset($serverconf[$server]['message'])) {
     // TODO: convert new lines to <br> and escape things to avoid injection vulnerabilities
     echo $serverconf[$server]['message'];
+} else {
+    echo "You have access to the server now! Welcome!";
 }
 
 ?>
