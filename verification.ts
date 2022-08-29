@@ -50,18 +50,18 @@ export class Verifier {
         const json : string = fs.readFileSync('servers.json', 'utf8');
         const dict : object = JSON.parse(json);
         const servers : string[] = [];
-        for (const [server, enabled] of Object.entries(dict)) {
-            if (enabled) {
+        for (const [server, props] of Object.entries(dict)) {
+            if (props !== undefined && props['enabled']) {
                 servers.push(server);
             }
         }
         return servers;
     }
 
-    async setKerbVerificationEnabled(serverId: string, enabled: boolean) {
+    async setKerbVerificationConfig(serverId: string, key: 'enabled'|'role'|'moira', value: any) {
         let json : string = fs.readFileSync('servers.json', 'utf8');
         const dict : any = JSON.parse(json); // TODO: use stronger type annotation
-        dict[serverId] = enabled;
+        dict[serverId][key] = value;
         json = JSON.stringify(dict);
         fs.writeFileSync('servers.json', json);
     }
@@ -71,7 +71,7 @@ export class Verifier {
      * @param serverId discord id of the server
      */
     async enableKerbVerification(serverId: string) {
-        await this.setKerbVerificationEnabled(serverId, true);
+        await this.setKerbVerificationConfig(serverId, 'enabled', true);
     }
 
     /**
@@ -79,7 +79,26 @@ export class Verifier {
      * @param serverId discord id of the server
      */
      async disableKerbVerification(serverId: string) {
-        await this.setKerbVerificationEnabled(serverId, false);
+        await this.setKerbVerificationConfig(serverId, 'enabled', false);
+    }
+
+    /**
+     * Set verified role for server
+     * @param serverId discord id of the server
+     * @param roleId discord id of the role
+     */
+    async setKerbVerificationRole(serverId: string, roleId: string) {
+        await this.setKerbVerificationConfig(serverId, 'role', roleId);
+    }
+
+    /** 
+     * Set moira list to check against. If null, will check for any kerb.
+     * @param serverId discord id of the server
+     * @param list name of the moira list for allowed members
+     */
+    async setKerbVerificationMoiraList(serverId: string, list: string) {
+        /// TODO: implement this on the server side so it actually does something
+        await this.setKerbVerificationConfig(serverId, 'moira', list);
     }
 
     /**
@@ -87,7 +106,7 @@ export class Verifier {
      * Resolve with a nullary value, or reject with an error message.
      * @param {string} id the id of the person to check
      */
-    async isCommit(id: Snowflake) {
+    async is2025Commit(id: Snowflake) {
         const guildMember = this.base_guild.members.cache.get(id);
         if (!guildMember) {
             throw "You're not in the MIT 2025 server.";
@@ -148,7 +167,7 @@ export class Verifier {
                 return;
             }
             try {
-                await this.isCommit(guildMember.id);
+                await this.is2025Commit(guildMember.id);
                 if (role) {
                     guildMember.roles.add(role);
                     return true;
@@ -228,10 +247,12 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
     }, {
         name: 'enableVerification',
         call: async (msg: Message) => {
-            /// TODO: ensure admin or mod
+            /// TODO: ensure admin or mod for all these commands
             if (msg.guild != null) {
                 const id : string = msg.guild.id;
                 await verifier.enableKerbVerification(id);
+                const { role } = verifier.get_cached(msg.guild);
+                await verifier.setKerbVerificationRole(id, role.id);
                 msg.reply(`Verification has been enabled for ${msg.guild.name}`);
             }
         },
@@ -242,6 +263,28 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
                 const id : string = msg.guild.id;
                 await verifier.disableKerbVerification(id);
                 msg.reply(`Verification has been disabled for ${msg.guild.name}`); 
+            }
+        }
+    }, {
+        name: 'setVerificationRole',
+        call: async (msg: Message, args: string[]) => {
+            if (msg.guild != null) {
+                if (!args[1]) {
+                    msg.reply("Please specify a role id for the verified role id.")
+                } else {
+                    await verifier.setKerbVerificationRole(msg.guild.id, args[1])
+                }
+            }
+        }
+    }, {
+        name: 'setVerificationMoiraList',
+        call: async (msg: Message, args: string[]) => {
+            if (msg.guild != null) {
+                if (!args[1]) {
+                    msg.reply("Please specify a moira list to check against.")
+                } else {
+                    await verifier.setKerbVerificationMoiraList(msg.guild.id, args[1])
+                }
             }
         }
     }, {

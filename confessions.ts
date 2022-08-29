@@ -146,11 +146,11 @@ const deconfessCommand = (client: Client, msg: Message, args: string[]) => {
 /// For now, the logic is slightly different because 2026s only want `boomerconfess`
 
 const confessCommandDisambiguator = async (client: Client, verifier: verification.Verifier, msg: Message, args: string[]) => {
-    Promise.allSettled([verifier.isCommit(msg.author.id), verifier.is2026Commit(msg.author.id)]).then(values => {
+    Promise.allSettled([verifier.is2025Commit(msg.author.id), verifier.is2026Commit(msg.author.id)]).then(values => {
         const is2025 = values[0].status === 'fulfilled';
         const is2026 = values[1].status === 'fulfilled';
         if (is2025) {
-            confessCommand(client, verifier.isCommit.bind(verifier), client.channels.resolve(config.confessions_channel) as TextChannel, 'Confession', config.server_mods, msg, args);
+            confessCommand(client, verifier.is2025Commit.bind(verifier), client.channels.resolve(config.confessions_channel) as TextChannel, 'Confession', config.server_mods, msg, args);
         } else if (is2026) {
             msg.reply("This command is unavailable per 2026 mods request. Only `boomerconfess` is available");
         } else {
@@ -160,13 +160,13 @@ const confessCommandDisambiguator = async (client: Client, verifier: verificatio
 }
 
 const boomerconfessCommandDisambiguator = async (client: Client, verifier: verification.Verifier, msg: Message, args: string[]) => {
-    Promise.allSettled([verifier.isCommit(msg.author.id), verifier.is2026Commit(msg.author.id)]).then(values => {
+    Promise.allSettled([verifier.is2025Commit(msg.author.id), verifier.is2026Commit(msg.author.id)]).then(values => {
         const is2025 = values[0].status === 'fulfilled';
         const is2026 = values[1].status === 'fulfilled';
         if (is2025 && is2026 && args[0] == 'boomerconfess') {
             msg.reply("You are both a '25 and '26 so please use `boomerconfess25` or `boomerconfess26` to specify where to confess.");
         } else if (is2025 || args[0] == 'boomerconfess25') {
-            confessCommand(client, verifier.isCommit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel) as TextChannel, 'Confession w/ boomers', config.server_mods, msg, args);
+            confessCommand(client, verifier.is2025Commit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel) as TextChannel, 'Confession w/ boomers', config.server_mods, msg, args);
         } else if (is2026 || args[0] == 'boomerconfess26') {
             confessCommand(client, verifier.is2026Commit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel_2026) as TextChannel, 'Confession w/ boomers', config.server_mods_2026, msg, args);
         } else {
@@ -190,11 +190,11 @@ const genCommands = (client: Client, config: ConfessionsSetup, verifier: verific
     {
         name: 'confess25',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier.isCommit.bind(verifier), client.channels.resolve(config.confessions_channel) as TextChannel, 'Confession', config.server_mods),
+        call: confessCommand.bind(null, client, verifier.is2025Commit.bind(verifier), client.channels.resolve(config.confessions_channel) as TextChannel, 'Confession', config.server_mods),
     }, {
         name: 'boomerconfess25',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier.isCommit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel) as TextChannel, 'Confession w/ boomers', config.server_mods),
+        call: confessCommand.bind(null, client, verifier.is2025Commit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel) as TextChannel, 'Confession w/ boomers', config.server_mods),
     }, {
         name: 'confess26',
         unprefixed: true,
