@@ -9,9 +9,9 @@ include 'verify_common.php';
 /// Check for duplicates
 $numDiscordsByKerb = mysqli_num_rows(mysqli_query($connection, "SELECT discord FROM kerbs26 where kerb=\"$kerb\""));
 $numKerbsByDiscord = mysqli_num_rows(mysqli_query($connection, "SELECT kerb FROM kerbs26 where discord=\"$member\""));
-if ($numKerbsByDiscord > 0) {
-	die("You have already verified this Discord account, no need to do it again! If you need help, please contact staff by DM or 2025discordadmin@mit.edu.");
-}
+// if ($numKerbsByDiscord > 0) {
+// 	die("You have already verified this Discord account, no need to do it again! If you need help, please contact staff by DM or 2025discordadmin@mit.edu.");
+// }
 
 if ($numDiscordsByKerb > 0) {
 	die("You have already registered a Discord account with that kerb ($kerb)");
