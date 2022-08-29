@@ -46,10 +46,10 @@ export class Verifier {
     /**
      * Gets the list of servers that have kerb verification enabled (i.e. any kerb)
      */
-    async getKerbVerificationServers() : Promise<string[]> {
-        const json : string = fs.readFileSync('servers.json', 'utf8');
-        const dict : object = JSON.parse(json);
-        const servers : string[] = [];
+    async getKerbVerificationServers(): Promise<string[]> {
+        const json: string = fs.readFileSync('servers.json', 'utf8');
+        const dict: object = JSON.parse(json);
+        const servers: string[] = [];
         for (const [server, props] of Object.entries(dict)) {
             if (props !== undefined && props['enabled']) {
                 servers.push(server);
@@ -58,9 +58,9 @@ export class Verifier {
         return servers;
     }
 
-    async setKerbVerificationConfig(serverId: string, key: 'enabled'|'role'|'moira', value: any) {
-        let json : string = fs.readFileSync('servers.json', 'utf8');
-        const dict : any = JSON.parse(json); // TODO: use stronger type annotation
+    async setKerbVerificationConfig(serverId: string, key: 'enabled' | 'role' | 'moira', value: any) {
+        let json: string = fs.readFileSync('servers.json', 'utf8');
+        const dict: any = JSON.parse(json); // TODO: use stronger type annotation
         if (dict[serverId] === undefined) {
             dict[serverId] = {};
         }
@@ -81,7 +81,7 @@ export class Verifier {
      * Disables kerb verification for server `serverId`
      * @param serverId discord id of the server
      */
-     async disableKerbVerification(serverId: string) {
+    async disableKerbVerification(serverId: string) {
         await this.setKerbVerificationConfig(serverId, 'enabled', false);
     }
 
@@ -95,11 +95,11 @@ export class Verifier {
     }
 
     /** 
-     * Set moira list to check against. If null, will check for any kerb.
+     * Set moira list to check against. If undefined, will check for any kerb.
      * @param serverId discord id of the server
      * @param list name of the moira list for allowed members
      */
-    async setKerbVerificationMoiraList(serverId: string, list: string) {
+    async setKerbVerificationMoiraList(serverId: string, list: string | undefined) {
         /// TODO: implement this on the server side so it actually does something
         await this.setKerbVerificationConfig(serverId, 'moira', list);
     }
@@ -161,7 +161,7 @@ export class Verifier {
             } catch (e) {
                 console.log(e);
                 return false;
-            }            
+            }
         } else {
             /// Give verified role to 2025s who join 2025-affiliated servers
             const { channel, role } = this.get_cached(guild);
@@ -252,20 +252,24 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
         call: async (msg: Message) => {
             /// TODO: ensure admin or mod for all these commands
             if (msg.guild != null) {
-                const id : string = msg.guild.id;
-                await verifier.enableKerbVerification(id);
-                const { role } = verifier.get_cached(msg.guild);
-                await verifier.setKerbVerificationRole(id, role.id);
-                msg.reply(`Verification has been enabled for ${msg.guild.name}`);
+                try {
+                    const id: string = msg.guild.id;
+                    await verifier.enableKerbVerification(id);
+                    const { role } = verifier.get_cached(msg.guild);
+                    await verifier.setKerbVerificationRole(id, role.id);
+                    msg.reply(`Verification has been enabled for ${msg.guild.name}`);
+                } catch (e) {
+                    msg.reply(`${e}`);
+                }
             }
         },
     }, {
         name: 'disableVerification',
         call: async (msg: Message) => {
             if (msg.guild != null) {
-                const id : string = msg.guild.id;
+                const id: string = msg.guild.id;
                 await verifier.disableKerbVerification(id);
-                msg.reply(`Verification has been disabled for ${msg.guild.name}`); 
+                msg.reply(`Verification has been disabled for ${msg.guild.name}`);
             }
         }
     }, {
@@ -293,7 +297,7 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
     }, {
         name: 'getVerificationServers',
         call: async (msg: Message) => {
-            const servers : string[] = await verifier.getKerbVerificationServers();
+            const servers: string[] = await verifier.getKerbVerificationServers();
             msg.reply(servers.toString());
         }
     }
@@ -319,7 +323,7 @@ ${getClassVerifyLink(member.id, '2025')}
     
 Once you're in the server, please check out #rules-n-how-to-discord, get roles in #roles, and don't forget to introduce yourself to your fellow adMITs in #introductions!`);
         }
-    
+
         const kerbVerificationServers = await verifier!.getKerbVerificationServers();
         if (kerbVerificationServers.includes(member.guild.id)) {
             member.send(`Hi! I'm Tim. To get access to "${member.guild.name}", please click on the following link:
