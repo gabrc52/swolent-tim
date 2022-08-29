@@ -90,7 +90,7 @@ const setup = (client: Client, config: CommandSetup) => [
                         throw error;
                     }
                     await msg.reply(`${stdout}\n${stderr}`);
-                    exec('npx tsc', async (error, stdout, stderr) => {
+                    exec('npx --cache node-cache tsc', async (error, stdout, stderr) => {
                         if (error) {
                             await msg.reply(`${error}`);
                         }
