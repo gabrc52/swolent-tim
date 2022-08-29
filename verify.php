@@ -6,7 +6,13 @@ define('INSTANCE', 'verify');
 
 include 'verify_common.php';
 
+/// Get server and role
 $server = $_GET['server'];
+$serverconf = json_decode(file_get_contents('servers.json'), true);
+if (!$serverconf[$server] || !$serverconf[$server]['enabled']) {
+    die("Verification is not enabled for this server");
+}
+$role = $serverconf[$server]['role'];
 
 /// Check for duplicates
 $numDiscordsByKerb = mysqli_num_rows(mysqli_query($connection, "SELECT discord FROM kerbs where kerb=\"$kerb\""));
@@ -29,8 +35,7 @@ if (!$insert_result) {
 }
 
 /// Give role
-/// TODO: change verified role!
-$discord->RunAPI("PUT", "guilds/$server/members/$member/roles/".ROLE_VERIFIED_INTL, array(), array(), 204);
+$discord->RunAPI("PUT", "guilds/$server/members/$member/roles/$role", array(), array(), 204);
 
 echo "You have access to the server now! <br> You can introduce yourself in #intros and go to #roles to get roles for pronouns, class year, etc. <br>";
 
