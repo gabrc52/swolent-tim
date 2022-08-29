@@ -72,7 +72,7 @@ export class Verifier {
 
     async setKerbVerificationConfig(serverId: string, key: 'enabled' | 'role' | 'moira' | 'message', value: any) {
         let json: string = fs.readFileSync('servers.json', 'utf8');
-        const dict: any = JSON.parse(json); // TODO: use stronger type annotation
+        const dict: any = JSON.parse(json); // TODO: use stronger type annotation - maybe an interface
         if (dict[serverId] === undefined) {
             dict[serverId] = {};
         }
@@ -281,7 +281,7 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
                     await verifier.enableKerbVerification(id);
                     const { role } = verifier.get_cached(msg.guild);
                     if (role === undefined) {
-                        msg.reply('Please create a role called "verified" to give to people once they verify');
+                        msg.reply('Please create a role called "verified" to give to people once they verify, or set a verified role using `tim.setVerificationRole ROLE_ID_GOES_HERE`');
                     } else {
                         await verifier.setKerbVerificationRole(id, role.id);
                         msg.reply(`Verification has been enabled for ${msg.guild.name}`);
@@ -316,6 +316,7 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
                     msg.reply("Please specify a role id for the verified role id.")
                 } else {
                     await verifier.setKerbVerificationRole(msg.guild.id, args[1]);
+                    msg.reply(`Verified role successfully set to <@${args[1]}>!`)
                 }
             }
         }
@@ -332,6 +333,7 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
                     msg.reply("Please specify a moira list to check against.")
                 } else {
                     await verifier.setKerbVerificationMoiraList(msg.guild.id, args[1]);
+                    msg.reply(`List successfully set to ${args[1]}!`);
                 }
             }
         }
@@ -345,6 +347,7 @@ const genCommands = (verifier: Verifier, config: VerifySetup) => [
                 }
                 let text = msg.content.substr(args[0].length + 1).trim();
                 await verifier.setKerbVerificationMoiraList(msg.guild.id, text);
+                msg.reply(`Message successfully set!`);
             }
         }
     }, {
