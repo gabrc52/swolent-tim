@@ -61,6 +61,9 @@ export class Verifier {
     async setKerbVerificationConfig(serverId: string, key: 'enabled'|'role'|'moira', value: any) {
         let json : string = fs.readFileSync('servers.json', 'utf8');
         const dict : any = JSON.parse(json); // TODO: use stronger type annotation
+        if (dict[serverId] === undefined) {
+            dict[serverId] = {};
+        }
         dict[serverId][key] = value;
         json = JSON.stringify(dict);
         fs.writeFileSync('servers.json', json);
