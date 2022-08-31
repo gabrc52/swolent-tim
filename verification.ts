@@ -81,6 +81,16 @@ export class Verifier {
         fs.writeFileSync('servers.json', json);
     }
 
+    async getKerbVerificationConfig(serverId: string, key: 'enabled' | 'role' | 'moira' | 'message') {
+        let json: string = fs.readFileSync('servers.json', 'utf8');
+        const dict: any = JSON.parse(json); // TODO: use stronger type annotation - maybe an interface
+        if (dict[serverId] === undefined) {
+            return undefined;
+        } else {
+            return dict[serverId][key];
+        }
+    }
+
     /**
      * Enables kerb verification for server `serverId`
      * @param serverId discord id of the server
@@ -95,6 +105,14 @@ export class Verifier {
      */
     async disableKerbVerification(serverId: string) {
         await this.setKerbVerificationConfig(serverId, 'enabled', false);
+    }
+
+    /**
+     * 
+     * @param serverId 
+     */
+    async isKerbVerificationEnabled(serverId: string): Promise<boolean> {
+        return await this.getKerbVerificationConfig(serverId, 'enabled') || false;
     }
 
     /**
@@ -200,7 +218,9 @@ export class Verifier {
                     return false;
                 }
             } catch (error) {
-                channel.send(`${guildMember}: ${error}`);
+                if (!await this.isKerbVerificationEnabled(guildMember.guild.id)) {
+                    channel.send(`${guildMember}: ${error}`);
+                }
                 return false;
             }
         }
