@@ -36,7 +36,8 @@ const encryptWithPublicKey = (fragment: string, publicKey: string) => {
 const zip = <T, U>(a: T[], b: U[]) => a.map((x, i) => [x, b[i]]);
 
 const logConfession = async (number: number, confession: string, confessAttachments: MessageAttachment[], confessor: Snowflake, msg: Message, client: Client, confessionType: ConfessionType, modsDict: ModMap) => {
-    const secretStr = `${confessionType} #${number} by ${confessor}`;
+    const pepper = Math.random().toString(36).substring(2); // randomly generated string, from https://gist.github.com/6174/6062387
+    const secretStr = `${confessionType} #${number} by ${confessor} [ignore: ${pepper}]`;
     const secret = Buffer.from(secretStr);
     const mods = Object.keys(modsDict);
     const publicKeys = Object.values(modsDict);
