@@ -8,6 +8,7 @@ import type { Client, TextChannel, Message, MessageAttachment, Snowflake } from 
 
 interface ConfessionsSetup {
     confessions_channel: Snowflake,
+    confessions_channel_2026: Snowflake,
     boomer_confessions_channel: Snowflake,
     boomer_confessions_channel_2026: Snowflake,
     server_mods: ModMap,
@@ -199,13 +200,11 @@ const genCommands = (client: Client, config: ConfessionsSetup, verifier: verific
     }, {
         name: 'confess26',
         unprefixed: true,
-        call: (msg: Message) => {
-            msg.reply('Not implemented per 2026s mods request. Only `boomerconfess` is available.');
-        }
+        call: confessCommand.bind(null, client, verifier.is2026Commit.bind(verifier), client.channels.resolve(config.confessions_channel_2026) as TextChannel, 'Confession', config.server_mods_2026)
     }, {
         name: 'boomerconfess26',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier.is2026Commit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel_2026), 'Confession w/ boomers', config.server_mods_2026),
+        call: confessCommand.bind(null, client, verifier.is2026Commit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel_2026) as TextChannel, 'Confession w/ boomers', config.server_mods_2026),
     }, {
         name: 'deconfess',
         call: deconfessCommand.bind(null, client),

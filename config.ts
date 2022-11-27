@@ -22,6 +22,7 @@ export = {
         role_for_2026s_in_2025_server: '984550352881877043'
     },
     confessions_channel: '819127555911188541',
+    confessions_channel_2026: '1046256259986358282',
     boomer_confessions_channel: '836071068175171606',
     boomer_confessions_channel_2026: '967856190585471086',
     welcome_channel: '820830137674760202',
