@@ -156,9 +156,9 @@ const confessCommandDisambiguator = async (client: Client, verifier: verificatio
         const is2025 = values[0].status === 'fulfilled';
         const is2026 = values[1].status === 'fulfilled';
         if (is2025) {
-            generateConfessionsCommand(client, verifier, config.confessions_channel, 'Confession', config.server_mods)();
+            generateConfessionsCommand(client, verifier, config.confessions_channel, 'Confession', config.server_mods)(msg, args);
         } else if (is2026) {
-            generateConfessionsCommand(client, verifier, config.confessions_channel_2026, 'Confession', config.server_mods_2026)();
+            generateConfessionsCommand(client, verifier, config.confessions_channel_2026, 'Confession', config.server_mods_2026)(msg, args);
         } else {
             msg.reply("This command is only available for people in the MIT 2025 or MIT 2026 servers. If you are, please verify. If it still doesn't work, let mods know");
         }
@@ -172,9 +172,9 @@ const boomerconfessCommandDisambiguator = async (client: Client, verifier: verif
         if (is2025 && is2026 && args[0] == 'boomerconfess') {
             msg.reply("You are both a '25 and '26 so please use `boomerconfess25` or `boomerconfess26` to specify where to confess.");
         } else if (is2025 || args[0] == 'boomerconfess25') {
-            generateConfessionsCommand(client, verifier, config.boomer_confessions_channel, 'Confession w/ boomers', config.server_mods)();
+            generateConfessionsCommand(client, verifier, config.boomer_confessions_channel, 'Confession w/ boomers', config.server_mods)(msg, args);
         } else if (is2026 || args[0] == 'boomerconfess26') {
-            generateConfessionsCommand(client, verifier, config.boomer_confessions_channel_2026, 'Confession w/ boomers', config.server_mods_2026)();
+            generateConfessionsCommand(client, verifier, config.boomer_confessions_channel_2026, 'Confession w/ boomers', config.server_mods_2026)(msg, args);
         } else {
             msg.reply("This command is only available for people in the MIT 2025 or MIT 2026 servers. If you are, please verify. If it still doesn't work, let mods know");
         }
