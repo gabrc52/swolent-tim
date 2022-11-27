@@ -147,14 +147,18 @@ const deconfessCommand = (client: Client, msg: Message, args: string[]) => {
 /// TODO: some of the code here is repeated, could also avoid repetition by making a new function that branches out and receives 2 functions (2025 and 2026) as parameters...
 /// For now, the logic is slightly different because 2026s only want `boomerconfess`
 
+const generateConfessionsCommand = (client: Client, verifier: verification.Verifier, channelId: Snowflake, prefix: string, mods: ModMap) => {
+    return confessCommand.bind(null, client, verifier.is2025Commit.bind(verifier), client.channels.resolve(channelId) as TextChannel, prefix, mods);
+}
+
 const confessCommandDisambiguator = async (client: Client, verifier: verification.Verifier, msg: Message, args: string[]) => {
     Promise.allSettled([verifier.is2025Commit(msg.author.id), verifier.is2026Commit(msg.author.id)]).then(values => {
         const is2025 = values[0].status === 'fulfilled';
         const is2026 = values[1].status === 'fulfilled';
         if (is2025) {
-            confessCommand(client, verifier.is2025Commit.bind(verifier), client.channels.resolve(config.confessions_channel) as TextChannel, 'Confession', config.server_mods, msg, args);
+            generateConfessionsCommand(client, verifier, config.confessions_channel, 'Confession', config.server_mods)();
         } else if (is2026) {
-            msg.reply("This command is unavailable per 2026 mods request. Only `boomerconfess` is available");
+            generateConfessionsCommand(client, verifier, config.confessions_channel_2026, 'Confession', config.server_mods_2026)();
         } else {
             msg.reply("This command is only available for people in the MIT 2025 or MIT 2026 servers. If you are, please verify. If it still doesn't work, let mods know");
         }
@@ -168,9 +172,9 @@ const boomerconfessCommandDisambiguator = async (client: Client, verifier: verif
         if (is2025 && is2026 && args[0] == 'boomerconfess') {
             msg.reply("You are both a '25 and '26 so please use `boomerconfess25` or `boomerconfess26` to specify where to confess.");
         } else if (is2025 || args[0] == 'boomerconfess25') {
-            confessCommand(client, verifier.is2025Commit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel) as TextChannel, 'Confession w/ boomers', config.server_mods, msg, args);
+            generateConfessionsCommand(client, verifier, config.boomer_confessions_channel, 'Confession w/ boomers', config.server_mods)();
         } else if (is2026 || args[0] == 'boomerconfess26') {
-            confessCommand(client, verifier.is2026Commit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel_2026) as TextChannel, 'Confession w/ boomers', config.server_mods_2026, msg, args);
+            generateConfessionsCommand(client, verifier, config.boomer_confessions_channel_2026, 'Confession w/ boomers', config.server_mods_2026)();
         } else {
             msg.reply("This command is only available for people in the MIT 2025 or MIT 2026 servers. If you are, please verify. If it still doesn't work, let mods know");
         }
@@ -188,23 +192,22 @@ const genCommands = (client: Client, config: ConfessionsSetup, verifier: verific
         unprefixed: true,
         call: boomerconfessCommandDisambiguator.bind(null, client, verifier),
     },
-    /// TODO: remove the following lines. There for debug/migration purposes
     {
         name: 'confess25',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier.is2025Commit.bind(verifier), client.channels.resolve(config.confessions_channel) as TextChannel, 'Confession', config.server_mods),
+        call: generateConfessionsCommand(client, verifier, config.confessions_channel, 'Confession', config.server_mods),
     }, {
         name: 'boomerconfess25',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier.is2025Commit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel) as TextChannel, 'Confession w/ boomers', config.server_mods),
+        call: generateConfessionsCommand(client, verifier, config.boomer_confessions_channel, 'Confession w/ boomers', config.server_mods),
     }, {
         name: 'confess26',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier.is2026Commit.bind(verifier), client.channels.resolve(config.confessions_channel_2026) as TextChannel, 'Confession', config.server_mods_2026)
+        call: generateConfessionsCommand(client, verifier, config.confessions_channel_2026, 'Confession', config.server_mods_2026),
     }, {
         name: 'boomerconfess26',
         unprefixed: true,
-        call: confessCommand.bind(null, client, verifier.is2026Commit.bind(verifier), client.channels.resolve(config.boomer_confessions_channel_2026) as TextChannel, 'Confession w/ boomers', config.server_mods_2026),
+        call: generateConfessionsCommand(client, verifier, config.boomer_confessions_channel_2026, 'Confession w/ boomers', config.server_mods_2026),
     }, {
         name: 'deconfess',
         call: deconfessCommand.bind(null, client),
