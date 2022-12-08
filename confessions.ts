@@ -133,12 +133,12 @@ const confessCommand = async (client: Client, verificationChecker: VerifierFn, c
     }).catch(error => msg.reply(`Can't confess: ${error}`));
 };
 
-const deconfessCommand = (client: Client, msg: Message, args: string[]) => {
+const deconfessCommand = (client: Client, force: Boolean, msg: Message, args: string[]) => {
     const fragmentStrings = args.slice(1);
     const numMods = Object.keys(config.server_mods).length;
     const neededFragments = Math.ceil(numMods / 2);
-    if (fragmentStrings.length < neededFragments) {
-        msg.reply(`Please enter at least ${neededFragments} deconfession fragments.`);
+    if (!force && fragmentStrings.length < neededFragments) {
+        msg.reply(`Please enter at least ${neededFragments} deconfession fragments. If this number is wrong (i.e. this was before more mods were added), try tim.forcedeconfess`);
     } else {
         const fragments = fragmentStrings.map(s => Buffer.from(s, 'base64'));
         msg.reply(sss.combine(fragments).toString());
@@ -211,7 +211,11 @@ const genCommands = (client: Client, config: ConfessionsSetup, verifier: verific
         call: generateConfessionsCommand(client, verifier.is2026Commit.bind(verifier), config.boomer_confessions_channel_2026, 'Confession w/ boomers', config.server_mods_2026),
     }, {
         name: 'deconfess',
-        call: deconfessCommand.bind(null, client),
+        call: deconfessCommand.bind(null, client, false),
+    },
+    {
+        name: 'forcedeconfess',
+        call: deconfessCommand.bind(null, client, true)
     }
 ];
 module.exports = {
