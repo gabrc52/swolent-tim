@@ -80,6 +80,8 @@ const logConfession = async (number: number, confession: string, confessAttachme
 
 const confessCommand = async (client: Client, verificationChecker: VerifierFn, channel: TextChannel, confessionType: ConfessionType, modsDict: ModMap, msg: Message, args: string[]) => {
     // TODO: Move this body into a class so we can persist some state
+    const confessor = msg.author.id;
+
     let confession = msg.content.substr(args[0].length + 1).trim();
     /// Remove brackets
     if (confession[0] === '[' && confession[confession.length - 1] === ']') {
@@ -106,7 +108,6 @@ const confessCommand = async (client: Client, verificationChecker: VerifierFn, c
     }
     let confessAttachments = msg.attachments.array();
 
-    const confessor = msg.author.id;
     /// Please don't remove the verification from here unless you are completely sure users are verified by here (not true at the moment).
     const verificationStatus = verificationChecker(confessor);
     verificationStatus.then(() => {
