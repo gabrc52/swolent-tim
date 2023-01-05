@@ -11,6 +11,8 @@ interface ConfessionsSetup {
     confessions_channel_2026: Snowflake,
     boomer_confessions_channel: Snowflake,
     boomer_confessions_channel_2026: Snowflake,
+    // encrypted_confessions_channel: Snowflake,
+    encrypted_confessions_channel_2026: Snowflake,
     server_mods: ModMap,
     server_mods_2026: ModMap,
 }
@@ -19,7 +21,8 @@ interface ModMap {
 	[key: Snowflake]: string | null;
 }
 
-type ConfessionType = 'Confession' | 'Confession w/ boomers';
+type ConfessionType = 'Confession' | 'Confession w/ boomers' | EncryptedConfessionType;
+type EncryptedConfessionType = 'Keying' | 'Encrypting' | 'Verifying' | 'Identifying' | 'Unencrypted personal';
 
 type VerifierFn = (id: Snowflake) => Promise<void>;
 
@@ -114,13 +117,46 @@ const confessCommand = async (client: Client, verificationChecker: VerifierFn, c
         const fileName = `confession_counter_${channel.id}`;
         fs.readFile(fileName, 'utf8', (err, data) => {
             let number = 1 + (err ? 0 : +data);
+            let confessionPrefix = `**#${number}**`;
+
+            if (confessionType === 'Keying') {
+                const cipher = RSAcipher(random); // generate new RSA keypair
+                const pubkey = cipher.publicKey; // get public key
+                const prikey = cipher.privateKey; // get private key
+                await sendPrivateKeyToConfessor(number, prikey); // todo dm confessor "Your private key for **${number}** is: ${prikey}"
+                // todo should the above message self destruct in a while? I feel like probably not unless asked to since prikey is needed to decrypt
+                confession += ` | keyhash: ${shorthash(pubkey)}; key: ${pubkey}`; // todo shorthash should be MD5(pubkey)[0:5]
+            } else if (confessionType === 'Encrypting') {
+                const ix = confession.indexOf(' ');
+                const pubkey = confession.substring(0, ix).trim();
+                confession = confession.substring(ix + 1).trim();
+                const encryptor = RSAencryptor(pubkey); // todo create RSA encryptor with given key
+                confession = encryptor.encrypt(confession); // todo encrypt confession and encode b64
+                confessionPrefix = `**#${number}** for **${shorthash(pubkey)}**`; // todo shorthash should be MD5(pubkey)[0:5]
+            } else if (confessionType === 'Verifying') {
+                let ix = confession.indexOf(' ');
+                const prikey = confession.substring(0, ix).trim();
+                confession = confession.substring(ix + 1).trim(); 
+                ix = confession.indexOf(' ');
+                const pubkey = confession.substring(0, ix).trim();
+                confession = confession.substring(ix + 1).trim();
+                if (matches(prikey, pubkey)) { // todo check if private key matches public key
+                    confessionPrefix = `**#${number}** as **${shorthash(pubkey)}**`; // todo shorthash should be MD5(pubkey)[0:5]
+                }
+            }
+            // todo important detail: there needs to be a command 'decrypt' that takes a private key and ciphertext and decrypts the confession
+            // I have no idea how to make such a command
+
             logConfession(number, confession, confessAttachments, confessor, msg, client, confessionType, modsDict);
             fs.writeFileSync(fileName, number.toString());
             // const confessionMsg = new Discord.MessageEmbed()
-            //     .setAuthor(`${confessionType} #${number}`)
+            // //     .setAuthor(`${confessionType} #${number}`)
             //     .setColor(config.embed_color)
             //     .setDescription(confession);
-            const confessionMsg = `**#${number}**: ${confession}`;
+
+            // todo I chose to change confessmsg in this way because idk how ts works, but I assume there's a better way to do it with const
+            const confessionMsg = `${confessionPrefix}: ${confession}`;
+
             if (confessAttachments.length > 0){
                 channel.send({
                     content: confessionMsg,
@@ -205,6 +241,26 @@ const genCommands = (client: Client, config: ConfessionsSetup, verifier: verific
         name: 'confess26',
         unprefixed: true,
         call: generateConfessionsCommand(client, verifier.is2026Commit.bind(verifier), config.confessions_channel_2026, 'Confession', config.server_mods_2026),
+    }, {
+        name: 'personalconfess',
+        unprefixed: true,
+        call: generateConfessionsCommand(client, verifier.is2026Commit.bind(verifier), config.encrypted_confessions_channel_2026, 'Unencrypted personal', config.server_mods_2026),
+    }, {
+        name: 'encryptconfess',
+        unprefixed: true,
+        call: generateConfessionsCommand(client, verifier.is2026Commit.bind(verifier), config.encrypted_confessions_channel_2026, 'Keying', config.server_mods_2026),
+    }, {
+        name: 'keyconfess',
+        unprefixed: true,
+        call: generateConfessionsCommand(client, verifier.is2026Commit.bind(verifier), config.encrypted_confessions_channel_2026, 'Encrypting', config.server_mods_2026),
+    }, {
+        name: 'verifyconfess',
+        unprefixed: true,
+        call: generateConfessionsCommand(client, verifier.is2026Commit.bind(verifier), config.encrypted_confessions_channel_2026, 'Verifying', config.server_mods_2026),
+    }, {
+        name: 'userconfess',
+        unprefixed: true,
+        call: generateConfessionsCommand(client, verifier.is2026Commit.bind(verifier), config.encrypted_confessions_channel_2026, 'Identifying', config.server_mods_2026),
     }, {
         name: 'boomerconfess26',
         unprefixed: true,

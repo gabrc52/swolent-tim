@@ -23,6 +23,7 @@ export = {
     },
     confessions_channel: '819127555911188541',
     confessions_channel_2026: '1046256259986358282',
+    encrypted_confessions_channel_2026: '1060373558888505405',
     boomer_confessions_channel: '836071068175171606',
     boomer_confessions_channel_2026: '967856190585471086',
     welcome_channel: '820830137674760202',
