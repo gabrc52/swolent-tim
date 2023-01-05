@@ -143,6 +143,11 @@ const confessCommand = async (client: Client, verificationChecker: VerifierFn, c
                 if (matches(prikey, pubkey)) { // todo check if private key matches public key
                     confessionPrefix = `**#${number}** as **${shorthash(pubkey)}**`; // todo shorthash should be MD5(pubkey)[0:5]
                 }
+            } else if (confessionType === 'Identifying') {
+                const pubkey = confession
+                const encryptor = RSAencryptor(pubkey); // todo create RSA encryptor with given key
+                confession = encryptor.encrypt(username); // todo encrypt USERNAME and encode b64
+                confessionPrefix = `**#${number}** identifying for **${shorthash(pubkey)}**`; // todo shorthash should be MD5(pubkey)[0:5]
             }
             // todo important detail: there needs to be a command 'decrypt' that takes a private key and ciphertext and decrypts the confession
             // I have no idea how to make such a command
