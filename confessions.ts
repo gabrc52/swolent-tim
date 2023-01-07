@@ -11,6 +11,7 @@ interface ConfessionsSetup {
     confessions_channel_2026: Snowflake,
     boomer_confessions_channel: Snowflake,
     boomer_confessions_channel_2026: Snowflake,
+    personal_confessions_channel_2026: Snowflake,
     server_mods: ModMap,
     server_mods_2026: ModMap,
 }
@@ -209,6 +210,10 @@ const genCommands = (client: Client, config: ConfessionsSetup, verifier: verific
         name: 'boomerconfess26',
         unprefixed: true,
         call: generateConfessionsCommand(client, verifier.is2026Commit.bind(verifier), config.boomer_confessions_channel_2026, 'Confession w/ boomers', config.server_mods_2026),
+    }, {
+        name: 'personalconfess',
+        unprefixed: true,
+        call: generateConfessionsCommand(client, verifier.is2026Commit.bind(verifier), config.personal_confessions_channel_2026, 'Personal confession', config.server_mods_2026),
     }, {
         name: 'deconfess',
         call: deconfessCommand.bind(null, client, false),
