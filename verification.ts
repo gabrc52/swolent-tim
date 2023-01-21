@@ -53,8 +53,9 @@ export function generateVerifierFn(client: Client, guild_id: Snowflake, role_id:
         } else {
             if (role_id) {
                 const role = guildMember.roles.cache.get(role_id);
+                const role_name = guild?.roles.cache.get(role_id)!.name;
                 if (!role) {
-                    throw `You do not have the role "${role!.name}", which is required to run the command`;
+                    throw `You do not have the role "${role_name}", which is required to run the command`;
                 }
             }
         }
