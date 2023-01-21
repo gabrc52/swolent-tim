@@ -17,3 +17,6 @@ pepper.ts
 
 # all JS files, due to typescript
 *.js
+
+# Config file
+config.ts

@@ -35,6 +35,32 @@ interface CacheEntry {
  *       because for now otherwise there would be little point because busy beavers et al now just verify people who are in the discord student hub
  */
 
+type VerifierFn = (id: Snowflake) => Promise<void>;
+
+/**
+ * Generates a function that checks if a given user ID is verified enough (i.e. is in the given guild and has the given role, if given)
+ * @param client The client
+ * @param guild_id The guild to check if the user is in
+ * @param role_id The role to check if the user has (if not given, no roles are checked)
+ * @returns A function that resolves with a nullary value, or rejects with an error message.
+ */
+export function generateVerifierFn(client: Client, guild_id: Snowflake, role_id: Snowflake | undefined) {
+    return async (id: Snowflake) => {
+        const guild = client.guilds.cache.get(guild_id);
+        const guildMember = guild!.members.cache.get(id);
+        if (!guildMember) {
+            throw `You're not in "${guild?.name}"`;
+        } else {
+            if (role_id) {
+                const role = guildMember.roles.cache.get(role_id);
+                if (!role) {
+                    throw `You do not have the role "${role!.name}", which is required to run the command`;
+                }
+            }
+        }
+    }
+}
+
 // TODO: maybe separate the code into different classes? like the main class would be `Verifier` 
 // but the code could be in 3 other classes
 // And also, some of the code is in `bot.ts`, so uh, yeah.
@@ -43,12 +69,18 @@ export class Verifier {
     guild_2026: Guild;
     config: VerifyConfig;
     verify_cache: { [key: string]: CacheEntry };
+    is2025Commit: VerifierFn;
+    is2026Commit: VerifierFn;
 
     constructor(client: Client, config: VerifySetup) {
         this.base_guild = client.guilds.cache.get(config.guild_2025)!;
         this.guild_2026 = client.guilds.cache.get(config.guild_2026)!;
         this.config = config.verification;
         this.verify_cache = {};
+        
+        // Generate verification functions
+        this.is2025Commit = generateVerifierFn(client, config.guild_2025, config.verification.verified_role);
+        this.is2026Commit = generateVerifierFn(client, config.guild_2026, config.verification.verified_role_2026);
 
         if (!this.base_guild) {
             throw new Error(`Could not find base guild (id ${config.guild_2025})!`);
@@ -141,40 +173,6 @@ export class Verifier {
     async setKerbVerificationMoiraList(serverId: string, list: string | undefined) {
         /// TODO: implement this on the server side so it actually does something
         await this.setKerbVerificationConfig(serverId, 'moira', list);
-    }
-
-    /**
-     * Check if a Discord user has been verified as an comMIT by Swole Tim
-     * Resolve with a nullary value, or reject with an error message.
-     * @param {string} id the id of the person to check
-     */
-    async is2025Commit(id: Snowflake) {
-        const guildMember = this.base_guild.members.cache.get(id);
-        if (!guildMember) {
-            throw "You're not in the MIT 2025 server.";
-        } else {
-            const role = guildMember.roles.cache.get(this.config.verified_role);
-            if (!role) {
-                throw "Swole Tim hasn't verified you in the MIT 2025 server. Please follow the instructions to verify there.";
-            }
-        }
-    }
-
-    // TODO: Essentially copy-paste function. Maybe make it not reuse code so much?
-    /**
-     * Check if Discord user is verified as commited to the member of the class of 2026.
-     * @param {string} id the id of the person to check 
-     */
-    async is2026Commit(id: Snowflake) {
-        const guildMember = this.guild_2026.members.cache.get(id);
-        if (!guildMember) {
-            throw "You're not in the MIT 2026 server."
-        } else {
-            const role = guildMember.roles.cache.get(this.config.verified_role_2026);
-            if (!role) {
-                throw "Swole Tim hasn't verified you in the MIT 2026 server. Please follow the instructions to verify there."
-            }
-        }
     }
 
     get_cached(guild: Guild) {
@@ -428,4 +426,5 @@ module.exports = {
     setup,
     Verifier,
     getVerifyLink: getClassVerifyLink,
+    generateVerifierFn,
 };

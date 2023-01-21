@@ -6,12 +6,25 @@ import crypto = require('crypto');
 
 import type { Client, TextChannel, Message, MessageAttachment, Snowflake } from 'discord.js';
 
+interface ConfessionsChannelPrefs {
+    command: string,
+    description: string, // i.e. "Confession w/boomers"
+    guild: Snowflake,
+    channel: Snowflake,
+    role: Snowflake | undefined, // set to undefined to only check if the user is in the server
+    mods: ModMap,
+}
+
+
 interface ConfessionsSetup {
+    confessions_channels: ConfessionsChannelPrefs[],
+
+    // Legacy options
+    // TODO: phase out and figure out a way of still doing the disambiguation code
     confessions_channel: Snowflake,
     confessions_channel_2026: Snowflake,
     boomer_confessions_channel: Snowflake,
     boomer_confessions_channel_2026: Snowflake,
-    personal_confessions_channel_2026: Snowflake,
     server_mods: ModMap,
     server_mods_2026: ModMap,
 }
@@ -153,6 +166,11 @@ const generateConfessionsCommand = (client: Client, verificationFn: VerifierFn, 
     return confessCommand.bind(null, client, verificationFn, client.channels.resolve(channelId) as TextChannel, prefix, mods);
 }
 
+/// Get the confessions command from the config list item
+const confessionsCommandFromPrefs = (client: Client, prefs: ConfessionsChannelPrefs) => {
+    return generateConfessionsCommand(client, verification.generateVerifierFn(client, prefs.guild, prefs.role), prefs.channel, prefs.description, prefs.mods);
+}
+
 const confessCommandDisambiguator = async (client: Client, verifier: verification.Verifier, msg: Message, args: string[]) => {
     Promise.allSettled([verifier.is2025Commit(msg.author.id), verifier.is2026Commit(msg.author.id)]).then(values => {
         const is2025 = values[0].status === 'fulfilled';
@@ -193,28 +211,13 @@ const genCommands = (client: Client, config: ConfessionsSetup, verifier: verific
         name: 'boomerconfess',
         unprefixed: true,
         call: boomerconfessCommandDisambiguator.bind(null, client, verifier),
-    },
+    }, 
+    ...config.confessions_channels.map((prefs) => ({
+        name: prefs.command,
+        unprefixed: true,
+        call: confessionsCommandFromPrefs(client, prefs),
+    })), 
     {
-        name: 'confess25',
-        unprefixed: true,
-        call: generateConfessionsCommand(client, verifier.is2025Commit.bind(verifier), config.confessions_channel, 'Confession', config.server_mods),
-    }, {
-        name: 'boomerconfess25',
-        unprefixed: true,
-        call: generateConfessionsCommand(client, verifier.is2025Commit.bind(verifier), config.boomer_confessions_channel, 'Confession w/ boomers', config.server_mods),
-    }, {
-        name: 'confess26',
-        unprefixed: true,
-        call: generateConfessionsCommand(client, verifier.is2026Commit.bind(verifier), config.confessions_channel_2026, 'Confession', config.server_mods_2026),
-    }, {
-        name: 'boomerconfess26',
-        unprefixed: true,
-        call: generateConfessionsCommand(client, verifier.is2026Commit.bind(verifier), config.boomer_confessions_channel_2026, 'Confession w/ boomers', config.server_mods_2026),
-    }, {
-        name: 'personalconfess',
-        unprefixed: true,
-        call: generateConfessionsCommand(client, verifier.is2026Commit.bind(verifier), config.personal_confessions_channel_2026, 'Personal confession', config.server_mods_2026),
-    }, {
         name: 'deconfess',
         call: deconfessCommand.bind(null, client, false),
     },
