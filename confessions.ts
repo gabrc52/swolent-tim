@@ -70,7 +70,7 @@ const logConfession = async (number: number, confession: string, confessAttachme
         
         try {
             const user = await client.users.fetch(mod);
-            user.send(`**${confessionType} #${number}**: ${encryptedFragment}`);
+            user.send(`**${confessionType} #${number}**: ||${encryptedFragment}||`);
             if(confessAttachments.length > 0){
                 user.send({
                     content: `${confession}`,
