@@ -80,7 +80,7 @@ if (isset($_SERVER['SSL_CLIENT_S_DN_Email'])) {
         'redirect_uri' => 'https://discord2025.mit.edu/'.INSTANCE.'.php',
     ), [
         'Content-type: application/x-www-form-urlencoded',
-        'Authorization: Basic'.base64_encode(OAUTH_ID.':'.OAUTH_SECRET),
+        'Authorization: Basic '.base64_encode(OAUTH_ID.':'.OAUTH_SECRET),
     ]);
     if (!$tokenstuff) {
         /// If unable to get a token, try again
