@@ -74,7 +74,7 @@ if (isset($_SERVER['SSL_CLIENT_S_DN_Email'])) {
 
 } else if (isset($_GET['code'])) {
     /// OAuth authentication
-    $tokenstuff = post('https://oidc.mit.edu/token', array(
+    $tokenstuff = post('https://petrock.mit.edu/token', array(
         'grant_type' => 'authorization_code',
         'code' => $_GET['code'],
         'redirect_uri' => 'https://discord2025.mit.edu/'.INSTANCE.'.php',
@@ -89,7 +89,7 @@ if (isset($_SERVER['SSL_CLIENT_S_DN_Email'])) {
     $tokenstuff = json_decode($tokenstuff, true);
     $token = $tokenstuff['access_token'];
     // https://openid.net/specs/openid-connect-basic-1_0.html#UserInfoRequest
-    $userinfo = post('https://oidc.mit.edu/userinfo', array(
+    $userinfo = post('https://petrock.mit.edu/userinfo', array(
         'access_token' => $token
     ));
     $userinfo = json_decode($userinfo, true);
