@@ -43,17 +43,17 @@ if (!isset($_SERVER['SSL_CLIENT_S_DN_Email']) && (isset($_GET['id']) || isset($_
 }
 
 
-/// Code to make POST requests, used for OpenID/OAuth
+/// Code to make HTTP requests, used for OpenID/OAuth
 /// Reference: https://www.php.net/manual/en/context.http.php
-function post($url, $args) {
-	$postdata = http_build_query($args);
-	$opts = array('http' => array(
-        'method' => 'POST',
-        'header' => 'Content-type: application/x-www-form-urlencoded',
+function make_http_request($method, $url, $args, $headers) {
+    $postdata = http_build_query($args);
+    $opts = array('http' => array(
+        'method' => $method,
+        'header' => $headers,
         'content' => $postdata
     ));
-	$context = stream_context_create($opts);
-	return file_get_contents($url, false, $context);
+    $context = stream_context_create($opts);
+    return file_get_contents($url, false, $context);
 }
 
 /// Constants
@@ -74,13 +74,14 @@ if (isset($_SERVER['SSL_CLIENT_S_DN_Email'])) {
 
 } else if (isset($_GET['code'])) {
     /// OAuth authentication
-    $tokenstuff = post('https://petrock.mit.edu/token', array(
+    $tokenstuff = make_http_request('POST', 'https://petrock.mit.edu/token', array(
         'grant_type' => 'authorization_code',
         'code' => $_GET['code'],
         'redirect_uri' => 'https://discord2025.mit.edu/'.INSTANCE.'.php',
-        'client_id' => OAUTH_ID,
-        'client_secret' => OAUTH_SECRET
-    ));
+    ), [
+        'Content-type: application/x-www-form-urlencoded',
+        'Authorization: Basic'.base64_encode(OAUTH_ID.':'.OAUTH_SECRET),
+    ]);
     if (!$tokenstuff) {
         /// If unable to get a token, try again
         header("Location: https://discord2025.mit.edu/".INSTANCE.".php");
@@ -89,9 +90,9 @@ if (isset($_SERVER['SSL_CLIENT_S_DN_Email'])) {
     $tokenstuff = json_decode($tokenstuff, true);
     $token = $tokenstuff['access_token'];
     // https://openid.net/specs/openid-connect-basic-1_0.html#UserInfoRequest
-    $userinfo = post('https://petrock.mit.edu/userinfo', array(
+    $userinfo = make_http_request('POST', 'https://petrock.mit.edu/userinfo', array(
         'access_token' => $token
-    ));
+    ), 'Content-type: application/x-www-form-urlencoded');
     $userinfo = json_decode($userinfo, true);
     $email = $userinfo['email'];
 
