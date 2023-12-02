@@ -25,7 +25,7 @@ require "constants.php";
     <p>Your certificate did not work. Password authentication is experimental and may take up to 20 seconds to load.</p>
     Click on the following button to continue:
     <br>
-    <a class="button" href="https://petrock.mit.edu/authorize?client_id=<?= OAUTH_ID ?>&response_type=code&redirect_uri=https%3A%2F%2Fdiscord2025.mit.edu%2F<?= $_GET['instance'] ?>.php">Try password authentication</a>
+    <a class="button" href="https://petrock.mit.edu/authorize?client_id=<?= OAUTH_ID ?>&scope=openid+profile+email&response_type=code&redirect_uri=https%3A%2F%2Fdiscord2025.mit.edu%2F<?= $_GET['instance'] ?>.php">Try password authentication</a>
     <br>
     If password authentication doesn't work, we recommend:
     <ul>
