@@ -5,7 +5,7 @@ define('INSTANCE', 'verify');
 include 'verify_common.php';
 
 /// Get server and role
-$server = $_GET['server'];
+$server = $_REQUEST['server'];
 $serverconf = json_decode(file_get_contents('servers.json'), true);
 if (!$serverconf[$server] || !$serverconf[$server]['enabled']) {
     die("Verification is not enabled for this server");

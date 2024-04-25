@@ -38,6 +38,9 @@ if (!isset($_SERVER['SSL_CLIENT_S_DN_Email']) && (isset($_GET['id']) || isset($_
     if (isset($_GET['auth'])) {
         setcookie('auth', $_GET['auth']);
     }
+    if (isset($_GET['server'])) {
+        setcookie('server', $_GET['server']);
+    }
     header("Location: https://discord2025.mit.edu/".INSTANCE.".php");
     die();
 }
